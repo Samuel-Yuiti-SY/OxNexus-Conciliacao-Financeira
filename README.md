@@ -12,7 +12,15 @@ Não é necessário instalar dependências ou iniciar servidor.
 
 ## Publicação
 
-O projeto está preparado para publicação na Vercel como site estático.
+Site publicado na Vercel:
+
+https://oxnexus-conciliacao-financeira.vercel.app
+
+Repositório no GitHub:
+
+https://github.com/Samuel-Yuiti-SY/OxNexus-Conciliacao-Financeira
+
+O projeto está configurado para publicação na Vercel como site estático.
 
 Arquivo de configuração:
 
@@ -40,20 +48,12 @@ Senha: `123456`
 - `assets/oxnexus-logo-dark.png`: logo preparada para fundos escuros.
 - `vercel.json`: configuração de publicação na Vercel.
 
-## Nome recomendado para o repositório
+## Repositório
 
-`oxnexus-conciliacao-financeira`
-
-Título de apresentação:
+Nome do projeto:
 
 `OxNexus - Conciliadora Financeira`
 
-## Publicação no GitHub
+Slug público:
 
-Depois de criar um repositório vazio no GitHub com o nome recomendado, conecte este projeto ao remoto:
-
-```bash
-git remote add origin https://github.com/SEU-USUARIO/oxnexus-conciliacao-financeira.git
-git branch -M main
-git push -u origin main
-```
+`OxNexus-Conciliacao-Financeira`
