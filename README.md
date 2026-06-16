@@ -10,6 +10,14 @@ Abra o arquivo `index.html` no navegador.
 
 Não é necessário instalar dependências ou iniciar servidor.
 
+## Publicação
+
+O projeto está preparado para publicação na Vercel como site estático.
+
+Arquivo de configuração:
+
+- `vercel.json`: URLs limpas e headers básicos para servir a experiência como site.
+
 ## O que está incluído
 
 - Landing page responsiva com posicionamento, dor, solução, módulos, antifraude, IA contextual, planos e CTA.
@@ -30,6 +38,7 @@ Senha: `123456`
 - `styles.css`: identidade visual, responsividade e componentes.
 - `app.js`: navegação, dados fictícios e interações.
 - `assets/oxnexus-logo-dark.png`: logo preparada para fundos escuros.
+- `vercel.json`: configuração de publicação na Vercel.
 
 ## Nome recomendado para o repositório
 
