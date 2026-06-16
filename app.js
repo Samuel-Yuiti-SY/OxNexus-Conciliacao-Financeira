@@ -10,134 +10,187 @@ const toast = document.querySelector("#toast");
 const drawer = document.querySelector("#detailDrawer");
 const drawerTitle = document.querySelector("#drawerTitle");
 const drawerText = document.querySelector("#drawerText");
+const actionModal = document.querySelector("#actionModal");
+const modalTitle = document.querySelector("#modalTitle");
+const modalBody = document.querySelector("#modalBody");
+const modalFooter = document.querySelector("#modalFooter");
 
 const state = {
   screen: "dashboard",
   toastTimer: null,
+  fraudConfirmed: false,
   imports: [
-    ["vendas_maio_2026.csv", "CSV", "14/06/2026", "4.812", "Processado"],
-    ["retorno_cnab_341.ret", "CNAB", "14/06/2026", "1.208", "Com divergências"],
-    ["extrato_conta_237.ofx", "OFX", "13/06/2026", "928", "Aguardando análise"],
-    ["boletos_gateway.xlsx", "Excel", "12/06/2026", "312", "Erro de layout"],
+    ["vendas_pdv_01062026.csv", "Vendas ERP/PDV", "PDV", "01/06/2026", "420", "418", "2", "Processado", "Lucas Henrique"],
+    ["cielo_recebiveis_junho.csv", "Agenda de recebíveis", "Cielo", "01/06/2026", "385", "380", "5", "Com divergências", "Samuel Yuiti"],
+    ["extrato_itau_0106.ofx", "Extrato bancário", "Itaú", "01/06/2026", "96", "96", "0", "Processado", "Lucas Henrique"],
+    ["boletos_emitidos.csv", "Boletos", "ERP", "01/06/2026", "214", "210", "4", "Aguardando análise", "Tiago Schult"],
   ],
   tickets: [
-    ["CH-1042", "Erro de importação", "Em análise", "Não conseguimos interpretar esse arquivo. O time técnico já recebeu o layout."],
-    ["CH-1039", "Divergência financeira", "Respondido", "Há uma diferença de R$ 45,20 ligada à taxa cobrada pela operadora."],
-    ["CH-1031", "Solicitação de novo CNPJ", "Aberto", "Novo CNPJ aguardando validação cadastral."],
+    ["CH-1042", "Erro de importação", "Alta", "Em análise", "Tiago Schult", "16/06/2026 09:20"],
+    ["CH-1039", "Divergência financeira", "Média", "Respondido", "Mateus Sobral", "15/06/2026 17:40"],
+    ["CH-1031", "Novo CNPJ", "Baixa", "Aberto", "Gabriel de Melo", "14/06/2026 11:05"],
   ],
   aiMessages: [
-    ["ai", "Olá. Pergunte sobre a tela atual e eu ajudo a entender divergências, boletos, taxas ou conciliações."],
+    ["ai", "Olá. Pergunte sobre a tela atual e eu ajudo a entender divergências, boletos, taxas, depósitos e conciliações."],
   ],
 };
 
 const screens = [
-  { id: "dashboard", label: "Dashboard", icon: "DB", title: "Dashboard principal", eyebrow: "Visão consolidada" },
-  { id: "imports", label: "Importações", icon: "IM", title: "Importações", eyebrow: "Entrada de dados" },
-  { id: "sales", label: "Vendas", icon: "VD", title: "Vendas", eyebrow: "Registros vendidos" },
-  { id: "payments", label: "Pagamentos", icon: "PG", title: "Pagamentos", eyebrow: "Recebimentos bancários" },
-  { id: "boletos", label: "Boletos", icon: "BL", title: "Boletos", eyebrow: "Risco e conciliação" },
-  { id: "rates", label: "Taxas", icon: "TX", title: "Taxas", eyebrow: "Operadoras e bandeiras" },
-  { id: "nfce", label: "NFC-e", icon: "NF", title: "NFC-e", eyebrow: "Documentos fiscais" },
-  { id: "ecommerce", label: "E-commerce", icon: "EC", title: "E-commerce", eyebrow: "Pedidos e gateways" },
-  { id: "reconciliations", label: "Conciliações", icon: "CC", title: "Conciliações", eyebrow: "Divergências e ações" },
-  { id: "antifraud", label: "Antifraude", icon: "AF", title: "Antifraude", eyebrow: "Regras de segurança" },
+  { id: "dashboard", label: "Dashboard", icon: "DB", title: "Dashboard executivo", eyebrow: "01/06/2026 a 15/06/2026" },
+  { id: "imports", label: "Importações", icon: "IM", title: "Importações", eyebrow: "Entrada e validação de dados" },
+  { id: "sales", label: "Vendas ERP/PDV", icon: "VD", title: "Vendas ERP/PDV", eyebrow: "Sistema interno do cliente" },
+  { id: "operator", label: "Transações Operadora", icon: "OP", title: "Transações operadora", eyebrow: "Adquirentes, gateways e apps" },
+  { id: "receivables", label: "Recebíveis", icon: "RC", title: "Recebíveis", eyebrow: "Agenda prevista de liquidação" },
+  { id: "deposits", label: "Depósitos Bancários", icon: "DP", title: "Depósitos bancários", eyebrow: "Extrato, CNAB e OFX" },
+  { id: "boletos", label: "Boletos", icon: "BL", title: "Boletos", eyebrow: "Pagos, vencidos e suspeitos" },
+  { id: "rates", label: "Taxas", icon: "TX", title: "Taxas", eyebrow: "Contratada x cobrada" },
+  { id: "nfce", label: "NFC-e", icon: "NF", title: "NFC-e", eyebrow: "Documento fiscal x venda" },
+  { id: "ecommerce", label: "E-commerce", icon: "EC", title: "E-commerce", eyebrow: "Pedidos, gateways e chargebacks" },
+  { id: "reconciliations", label: "Conciliações", icon: "CC", title: "Conciliações", eyebrow: "Tela central da plataforma" },
+  { id: "antifraud", label: "Antifraude", icon: "AF", title: "Antifraude", eyebrow: "Riscos, alertas e regras" },
+  { id: "reports", label: "Relatórios", icon: "RT", title: "Relatórios", eyebrow: "Valor entregue e histórico" },
   { id: "ai", label: "IA OxNexus", icon: "IA", title: "IA OxNexus", eyebrow: "Ajuda contextual" },
-  { id: "support", label: "Suporte", icon: "SP", title: "Suporte", eyebrow: "Atendimento" },
-  { id: "settings", label: "Configurações", icon: "CF", title: "Configurações", eyebrow: "Parâmetros da empresa" },
-  { id: "technical", label: "Técnica", icon: "LG", title: "Tela técnica", eyebrow: "Logs e regras aplicadas" },
+  { id: "support", label: "Suporte", icon: "SP", title: "Suporte", eyebrow: "Chamados e solicitações" },
+  { id: "technical", label: "Área Técnica", icon: "LG", title: "Área técnica", eyebrow: "Logs, regras e mapeamentos" },
+  { id: "settings", label: "Configurações", icon: "CF", title: "Configurações", eyebrow: "Empresa, usuários e parâmetros" },
 ];
 
-const kpis = [
-  ["Total vendido", "R$ 124.850,00", "Alta de 8,4% no período"],
-  ["Total recebido", "R$ 117.420,00", "R$ 7.430,00 em análise"],
-  ["Divergências", "R$ 7.430,00", "Identificamos pontos que precisam de atenção."],
-  ["Boletos suspeitos", "12", "Marcados por regra de segurança."],
-  ["Conciliações concluídas", "78%", "Base atualizada há 12 minutos."],
-  ["Pendências em análise", "34", "Fila priorizada por impacto financeiro."],
+const dashboardKpis = [
+  ["Total vendido no ERP", "R$ 286.420,90", "Base: Ox Comércio Demonstrativo LTDA"],
+  ["Total confirmado nas operadoras", "R$ 285.980,90", "Cielo, Rede, Stone, Getnet, Mercado Pago e Pagar.me"],
+  ["Total líquido previsto", "R$ 277.015,60", "Após taxas e parcelas calculadas"],
+  ["Total recebido no banco", "R$ 275.930,45", "Itaú, Sicredi, Banco do Brasil e Caixa"],
+  ["Diferença encontrada", "R$ 1.085,15", "Esse valor não bate com o depósito localizado no banco."],
+  ["Vendas conciliadas", "1.195", "Boa notícia: a maior parte das vendas do período já está conciliada."],
+  ["Vendas divergentes", "31", "Encontramos divergências que precisam da sua atenção."],
+  ["Vendas não encontradas", "16", "Há registros em uma origem sem par correspondente."],
+  ["Boletos suspeitos", "6", "Marcados por regra de segurança."],
+  ["Possíveis fraudes", "2", "Beneficiário ou conta divergente."],
+  ["Taxas divergentes", "R$ 545,15", "Identificamos taxas cobradas acima do cadastro contratado."],
 ];
+
+const commonFilters = ["Período", "Empresa/CNPJ", "Loja", "Operadora", "Banco", "Canal", "Status"];
 
 const tables = {
   sales: {
-    headers: ["Data", "Cliente", "Valor bruto", "Forma de pagamento", "Operadora", "Status da conciliação", "Ação"],
+    description: "Vendas registradas no sistema interno do cliente.",
+    filters: ["Período", "Loja", "Forma de pagamento", "Operadora", "Bandeira", "Status", "NSU", "Valor"],
+    actions: ["Importar vendas", "Conciliar selecionadas", "Exportar CSV", "Exportar PDF", "Ver detalhes", "Criar regra de correspondência", "Perguntar à IA"],
+    headers: ["Data da venda", "Loja", "Cliente", "Documento", "Forma", "Operadora esperada", "Bandeira", "NSU", "Autorização", "Valor bruto", "Parcelas", "Status conciliação", "Ação"],
     rows: [
-      ["16/06/2026", "Mercado Lira", "R$ 2.840,00", "Crédito", "Cielo", "Conciliado"],
-      ["16/06/2026", "Studio Ápice", "R$ 1.260,00", "Pix", "Banco Itaú", "Conciliado"],
-      ["15/06/2026", "Casa Nobre", "R$ 4.920,00", "Crédito", "Rede", "Divergente"],
-      ["15/06/2026", "Nexus Moda", "R$ 890,00", "Débito", "Stone", "Aguardando análise"],
-      ["14/06/2026", "Delta Foods", "R$ 3.430,00", "Boleto", "Banco Santander", "Suspeito"],
+      ["03/06/2026", "Loja Maringá", "Cliente A", "NFC-e 12345", "Crédito", "Cielo", "Visa", "82741", "551920", "R$ 240,00", "3x", "Conciliado"],
+      ["03/06/2026", "Loja Maringá", "Cliente B", "NFC-e 12346", "Débito", "Rede", "Mastercard", "82742", "882110", "R$ 89,90", "1x", "Divergente"],
+      ["04/06/2026", "Loja Londrina", "Cliente C", "NFC-e 12347", "Crédito", "Stone", "Elo", "82743", "110554", "R$ 1.250,00", "6x", "Não encontrado"],
     ],
   },
-  payments: {
-    headers: ["Data prevista", "Data recebida", "Valor bruto", "Valor líquido", "Banco", "Conta", "Status", "Ação"],
+  operator: {
+    description: "Transações retornadas por adquirentes, gateways ou apps de pagamento.",
+    filters: ["Período", "Operadora", "Estabelecimento", "Terminal", "Bandeira", "Modalidade", "Status", "NSU"],
+    actions: ["Importar transações", "Comparar com ERP", "Ver divergentes", "Exportar", "Agrupar por lote", "Ver agenda de recebíveis"],
+    headers: ["Data captura", "Operadora", "Estabelecimento", "Terminal", "NSU", "Autorização", "TID", "Bandeira", "Modalidade", "Valor bruto", "Parcelas", "Status operadora", "Ação"],
     rows: [
-      ["17/06/2026", "16/06/2026", "R$ 2.840,00", "R$ 2.781,00", "Itaú", "341-2201", "Conciliado"],
-      ["16/06/2026", "16/06/2026", "R$ 1.260,00", "R$ 1.260,00", "Banco do Brasil", "001-3109", "Conciliado"],
-      ["15/06/2026", "16/06/2026", "R$ 4.920,00", "R$ 4.874,80", "Bradesco", "237-8872", "Divergente"],
-      ["14/06/2026", "-", "R$ 890,00", "-", "Santander", "033-9112", "Pendente"],
+      ["03/06/2026", "Cielo", "Estab. 1029", "POS 04", "82741", "551920", "TID984550", "Visa", "Crédito", "R$ 240,00", "3x", "Confirmada"],
+      ["03/06/2026", "Rede", "Estab. 1150", "POS 02", "82742", "882110", "TID775210", "Mastercard", "Débito", "R$ 92,90", "1x", "Confirmada"],
+      ["04/06/2026", "Stone", "Estab. 8891", "POS 01", "82799", "990012", "TID221100", "Elo", "Crédito", "R$ 450,00", "2x", "Não encontrada no ERP"],
+    ],
+  },
+  receivables: {
+    description: "Agenda de valores que a empresa deve receber das operadoras.",
+    filters: ["Data prevista", "Operadora", "Bandeira", "Lote", "Status", "Diferença"],
+    actions: ["Importar agenda", "Simular taxas", "Ver liquidações", "Comparar com banco", "Exportar agenda", "Solicitar análise"],
+    headers: ["Data prevista", "Operadora", "Bandeira", "Lote", "Quantidade vendas", "Valor bruto", "Taxa prevista", "Taxa cobrada", "Valor líquido previsto", "Status", "Ação"],
+    rows: [
+      ["07/06/2026", "Cielo", "Visa", "Lote 7781", "82", "R$ 18.420,00", "R$ 482,50", "R$ 482,50", "R$ 17.937,50", "Conciliado"],
+      ["07/06/2026", "Rede", "Mastercard", "Lote 7782", "51", "R$ 9.980,00", "R$ 249,50", "R$ 289,50", "R$ 9.690,50", "Taxa divergente"],
+      ["08/06/2026", "Stone", "Elo", "Lote 7783", "33", "R$ 12.250,00", "R$ 330,75", "R$ 330,75", "R$ 11.919,25", "Pendente"],
+    ],
+  },
+  deposits: {
+    description: "Valores efetivamente encontrados no extrato bancário.",
+    filters: ["Data", "Banco", "Conta", "Origem provável", "Status", "Valor"],
+    actions: ["Importar OFX", "Importar CNAB", "Vincular recebível", "Conciliar depósito", "Marcar como não identificado", "Exportar extrato conciliado", "Perguntar à IA"],
+    headers: ["Data", "Banco", "Conta", "Histórico", "Documento", "Valor", "Lote vinculado", "Origem provável", "Status", "Ação"],
+    rows: [
+      ["07/06/2026", "Itaú", "12345-6", "CIELO PAGTO CARTAO", "DOC7781", "R$ 17.937,50", "Lote 7781", "Cielo", "Conciliado"],
+      ["07/06/2026", "Itaú", "12345-6", "REDE CREDENCIADORA", "DOC7782", "R$ 9.650,50", "Lote 7782", "Rede", "Divergente"],
+      ["08/06/2026", "Sicredi", "99887-1", "CREDITO DIVERSOS", "DOC0009", "R$ 1.480,00", "Não vinculado", "Não identificada", "Em análise"],
     ],
   },
   boletos: {
-    headers: ["Nosso número", "Pagador", "Beneficiário", "Valor", "Vencimento", "Status bancário", "Classificação de risco", "Ação"],
+    description: "Controle de boletos emitidos, pagos, vencidos, baixados e suspeitos.",
+    filters: ["Vencimento", "Pagador", "Beneficiário", "Status bancário", "Classificação", "Valor"],
+    actions: ["Importar boletos", "Validar boletos", "Ver suspeitos", "Marcar como revisado", "Confirmar fraude", "Descartar suspeita", "Abrir chamado", "Exportar relatório antifraude"],
+    headers: ["Nosso número", "Pagador", "Beneficiário esperado", "Beneficiário informado", "Valor emitido", "Valor pago", "Vencimento", "Status bancário", "Classificação", "Ação"],
     rows: [
-      ["109238-7", "Mercado Lira", "OxNexus Tecnologia Ltda", "R$ 2.840,00", "18/06/2026", "Pago", "Conciliado"],
-      ["109241-2", "Delta Foods", "OX Nexus Serviços ME", "R$ 3.430,00", "20/06/2026", "Pago", "Possível fraude"],
-      ["109244-0", "Nexus Moda", "OxNexus Tecnologia Ltda", "R$ 890,00", "21/06/2026", "Em aberto", "Suspeito"],
-      ["109245-3", "Casa Nobre", "OxNexus Tecnologia Ltda", "R$ 4.920,00", "22/06/2026", "Pago", "Divergente"],
+      ["100245", "Cliente Alfa", "Loja Maringá LTDA", "Loja Maringá LTDA", "R$ 850,00", "R$ 850,00", "10/06/2026", "Pago", "Conciliado"],
+      ["100246", "Cliente Beta", "Loja Maringá LTDA", "Beneficiário Desconhecido", "R$ 1.200,00", "R$ 1.200,00", "10/06/2026", "Pago", state.fraudConfirmed ? "Fraude confirmada" : "Possível fraude"],
+      ["100247", "Cliente Gama", "Loja Maringá LTDA", "Loja Maringá LTDA", "R$ 980,00", "R$ 930,00", "11/06/2026", "Pago", "Divergente"],
+      ["100248", "Cliente Delta", "Loja Maringá LTDA", "Loja Maringá LTDA", "R$ 430,00", "R$ 0,00", "05/06/2026", "Vencido", "Em análise"],
     ],
   },
   rates: {
-    headers: ["Operadora", "Bandeira", "Tipo de pagamento", "Taxa contratada", "Taxa cobrada", "Diferença", "Status", "Ação"],
+    description: "Comparação entre taxa contratada e taxa cobrada.",
+    filters: ["Operadora", "Bandeira", "Modalidade", "Parcelas", "Status", "Impacto"],
+    actions: ["Cadastrar taxa", "Importar contrato", "Simular taxa", "Ver divergências", "Aplicar regra", "Exportar relatório"],
+    headers: ["Operadora", "Bandeira", "Modalidade", "Parcelas", "Taxa contratada", "Taxa cobrada", "Diferença", "Valor impactado", "Status", "Ação"],
     rows: [
-      ["Cielo", "Visa", "Crédito à vista", "2,10%", "2,10%", "0,00%", "Conciliado"],
-      ["Rede", "Mastercard", "Crédito 3x", "2,95%", "3,18%", "0,23%", "Divergente"],
-      ["Stone", "Elo", "Débito", "1,35%", "1,35%", "0,00%", "Conciliado"],
-      ["Getnet", "Visa", "Crédito 6x", "3,40%", "3,70%", "0,30%", "Divergente"],
+      ["Cielo", "Visa", "Crédito", "3x", "2,50%", "2,50%", "0,00%", "R$ 0,00", "Conciliado"],
+      ["Rede", "Mastercard", "Débito", "1x", "1,40%", "1,70%", "+0,30%", "R$ 40,00", "Divergente"],
+      ["Stone", "Elo", "Crédito", "6x", "2,70%", "2,90%", "+0,20%", "R$ 98,30", "Divergente"],
     ],
   },
   nfce: {
-    headers: ["Número", "Série", "Chave", "Valor fiscal", "Venda vinculada", "Status", "Ação"],
+    description: "Validação entre documentos fiscais, vendas e pagamentos.",
+    filters: ["Data", "Série", "Status SEFAZ", "Status conciliação", "Valor"],
+    actions: ["Importar NFC-e", "Cruzar com vendas", "Ver canceladas com pagamento", "Ver sem venda vinculada", "Exportar inconsistências"],
+    headers: ["Número", "Série", "Chave", "Data", "Valor fiscal", "Venda vinculada", "Status SEFAZ", "Status conciliação", "Ação"],
     rows: [
-      ["89422", "003", "3526 0612 9841 0001 55", "R$ 2.840,00", "VD-21098", "Conciliado"],
-      ["89423", "003", "3526 0612 9841 0002 36", "R$ 1.260,00", "VD-21104", "Conciliado"],
-      ["89424", "003", "3526 0612 9841 0003 17", "R$ 4.920,00", "VD-21107", "Divergente"],
-      ["89425", "003", "3526 0612 9841 0004 90", "R$ 890,00", "Sem vínculo", "Aguardando análise"],
+      ["12345", "1", "412606...", "03/06/2026", "R$ 240,00", "NSU 82741", "Autorizada", "Conciliada"],
+      ["12346", "1", "412606...", "03/06/2026", "R$ 89,90", "NSU 82742", "Autorizada", "Divergente"],
+      ["12347", "1", "412606...", "04/06/2026", "R$ 450,00", "Não vinculada", "Cancelada", "Atenção"],
     ],
   },
   ecommerce: {
-    headers: ["Pedido", "Cliente", "Valor", "Gateway", "Marketplace", "Status pedido", "Status pagamento", "Status conciliação", "Ação"],
+    description: "Conciliação de pedidos, gateways, marketplaces, cancelamentos e reembolsos.",
+    filters: ["Canal", "Gateway", "Status pedido", "Status pagamento", "Status conciliação", "Valor"],
+    actions: ["Importar pedidos", "Importar gateway", "Ver chargebacks", "Ver reembolsos", "Conciliar pedidos", "Exportar relatório"],
+    headers: ["Pedido", "Cliente", "Canal", "Gateway", "Valor pedido", "Frete", "Desconto", "Status pedido", "Status pagamento", "Status conciliação", "Ação"],
     rows: [
-      ["#49822", "Ana Ribeiro", "R$ 589,90", "Pagar.me", "Loja própria", "Entregue", "Pago", "Conciliado"],
-      ["#49831", "Rafael Costa", "R$ 1.249,00", "Mercado Pago", "Mercado Livre", "Enviado", "Pago", "Divergente"],
-      ["#49842", "Marina Lopes", "R$ 320,00", "Stripe", "Loja própria", "Cancelado", "Reembolsado", "Conciliado"],
-      ["#49857", "João Almeida", "R$ 2.100,00", "Adyen", "Amazon", "Entregue", "Chargeback", "Suspeito"],
+      ["PED-9001", "Cliente A", "Loja virtual", "Pagar.me", "R$ 320,00", "R$ 20,00", "R$ 0,00", "Enviado", "Pago", "Conciliado"],
+      ["PED-9002", "Cliente B", "Marketplace", "Mercado Pago", "R$ 580,00", "R$ 0,00", "R$ 50,00", "Cancelado", "Pago", "Divergente"],
+      ["PED-9003", "Cliente C", "Loja virtual", "Stripe", "R$ 1.100,00", "R$ 35,00", "R$ 0,00", "Entregue", "Chargeback", "Atenção"],
     ],
   },
   reconciliations: {
-    headers: ["Tipo", "Referência", "Valor esperado", "Valor encontrado", "Diferença", "Status", "Ação recomendada", "Ação"],
+    description: "Tela central da plataforma. Revise os dados antes de confirmar a conciliação.",
+    filters: ["Tipo", "Status", "Período", "Empresa", "Operadora", "Banco", "Valor", "Diferença", "Risco"],
+    actions: ["Conciliar automaticamente", "Conciliar manualmente", "Desconciliar", "Ver detalhes", "Aprovar ajuste", "Ignorar com justificativa", "Criar regra", "Reprocessar selecionados", "Exportar", "Perguntar à IA"],
+    headers: ["Tipo", "Referência", "Origem 1", "Origem 2", "Valor esperado", "Valor encontrado", "Diferença", "Status", "Confiança", "Ação recomendada", "Ação"],
     rows: [
-      ["Venda", "VD-21107", "R$ 4.920,00", "R$ 4.874,80", "R$ 45,20", "Divergente", "Revisar taxa cobrada"],
-      ["Boleto", "109241-2", "R$ 3.430,00", "R$ 3.430,00", "R$ 0,00", "Possível fraude", "Validar beneficiário"],
-      ["Pagamento", "PG-88210", "R$ 890,00", "-", "R$ 890,00", "Pendente", "Aguardar liquidação"],
-      ["E-commerce", "#49831", "R$ 1.249,00", "R$ 1.217,10", "R$ 31,90", "Divergente", "Conferir gateway"],
+      ["Venda", "NSU 82741", "ERP", "Cielo", "R$ 240,00", "R$ 240,00", "R$ 0,00", "Conciliado", "100%", "Nenhuma"],
+      ["Pagamento", "Lote 7782", "Rede", "Banco", "R$ 9.690,50", "R$ 9.650,50", "R$ 40,00", "Divergente", "82%", "Revisar taxa"],
+      ["Boleto", "100246", "ERP", "Banco", "R$ 1.200,00", "R$ 1.200,00", "R$ 0,00", state.fraudConfirmed ? "Fraude confirmada" : "Possível fraude", "65%", "Validar beneficiário"],
+      ["NFC-e", "12347", "SEFAZ", "ERP", "R$ 450,00", "R$ 0,00", "R$ 450,00", "Não encontrado", "70%", "Revisar cancelamento"],
     ],
   },
 };
 
+function normalize(value) {
+  return String(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
 function statusClass(status) {
-  const value = status.toLowerCase();
-  if (value.includes("fraude") || value.includes("erro") || value.includes("chargeback")) return "danger";
-  if (value.includes("suspeito")) return "suspect";
-  if (value.includes("diverg") || value.includes("pendente")) return "warn";
-  if (value.includes("aguardando") || value.includes("análise") || value.includes("aberto") || value.includes("respondido")) return "info";
+  const value = normalize(status);
+  if (value.includes("fraude") || value.includes("nao encontrado") || value.includes("erro") || value.includes("chargeback")) return "danger";
+  if (value.includes("suspeito") || value.includes("atencao") || value.includes("alto")) return "suspect";
+  if (value.includes("diverg") || value.includes("vencido") || value.includes("atrasado") || value.includes("taxa")) return "warn";
+  if (value.includes("analise") || value.includes("reprocessando") || value.includes("pendente") || value.includes("previsto")) return "reserve";
+  if (value.includes("aberto") || value.includes("respondido")) return "info";
   return "ok";
 }
 
 function pill(status) {
   return `<span class="pill ${statusClass(status)}">${status}</span>`;
-}
-
-function detailButton(label = "Ver detalhes", title = "Registro em análise") {
-  return `<button class="row-action" type="button" data-action="open-drawer" data-title="${title}">${label}</button>`;
 }
 
 function showToast(message) {
@@ -149,20 +202,20 @@ function showToast(message) {
 
 function setHash(hash) {
   const next = hash.startsWith("#") ? hash : `#${hash}`;
-  if (window.location.hash !== next) {
-    history.pushState(null, "", next);
-  }
+  if (window.location.hash !== next) history.pushState(null, "", next);
+}
+
+function hideOverlays() {
+  drawer.classList.add("hidden");
+  actionModal.classList.add("hidden");
 }
 
 function showLanding(hash = "inicio") {
   landing.classList.remove("hidden");
   prototype.classList.add("hidden");
-  drawer.classList.add("hidden");
+  hideOverlays();
   setHash(hash);
-  setTimeout(() => {
-    const target = document.querySelector(`#${hash}`);
-    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, 0);
+  setTimeout(() => document.querySelector(`#${hash}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
 }
 
 function showLogin() {
@@ -170,7 +223,7 @@ function showLogin() {
   prototype.classList.remove("hidden");
   loginView.classList.remove("hidden");
   appShell.classList.add("hidden");
-  drawer.classList.add("hidden");
+  hideOverlays();
   setHash("login");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -181,7 +234,7 @@ function showApp(screen = "dashboard") {
   prototype.classList.remove("hidden");
   loginView.classList.add("hidden");
   appShell.classList.remove("hidden");
-  drawer.classList.add("hidden");
+  hideOverlays();
   setHash(screen);
   renderMenu();
   renderScreen(screen);
@@ -190,14 +243,12 @@ function showApp(screen = "dashboard") {
 
 function renderMenu() {
   sideMenu.innerHTML = screens
-    .map(
-      (item) => `
-        <button type="button" class="${item.id === state.screen ? "active" : ""}" data-action="nav-screen" data-screen="${item.id}">
-          <span class="menu-icon">${item.icon}</span>
-          <span>${item.label}</span>
-        </button>
-      `
-    )
+    .map((item) => `
+      <button type="button" class="${item.id === state.screen ? "active" : ""}" data-action="nav-screen" data-screen="${item.id}">
+        <span class="menu-icon">${item.icon}</span>
+        <span>${item.label}</span>
+      </button>
+    `)
     .join("");
 }
 
@@ -209,18 +260,21 @@ function renderScreen(screen) {
   const renderers = {
     dashboard: renderDashboard,
     imports: renderImports,
-    sales: () => renderTableScreen("Vendas registradas", "Compare vendas registradas com pagamentos recebidos e veja onde a conciliação precisa de atenção.", tables.sales),
-    payments: () => renderTableScreen("Pagamentos recebidos", "Valide valores previstos, valores efetivamente pagos, banco, conta e status financeiro.", tables.payments),
+    sales: () => renderDataScreen("sales"),
+    operator: () => renderDataScreen("operator"),
+    receivables: () => renderDataScreen("receivables"),
+    deposits: () => renderDataScreen("deposits"),
     boletos: renderBoletos,
-    rates: () => renderTableScreen("Taxas por operadora", "Identifique cobranças diferentes das taxas contratadas sem precisar abrir planilhas paralelas.", tables.rates),
-    nfce: () => renderTableScreen("NFC-e vinculadas", "Cruze documentos fiscais com vendas registradas e encontre notas sem vínculo claro.", tables.nfce),
-    ecommerce: () => renderTableScreen("Pedidos de e-commerce", "Valide pedidos, gateways, marketplaces, cancelamentos, reembolsos e chargebacks.", tables.ecommerce),
+    rates: () => renderDataScreen("rates"),
+    nfce: () => renderDataScreen("nfce"),
+    ecommerce: () => renderDataScreen("ecommerce"),
     reconciliations: renderReconciliations,
     antifraud: renderAntifraud,
+    reports: renderReports,
     ai: renderAi,
     support: renderSupport,
-    settings: renderSettings,
     technical: renderTechnical,
+    settings: renderSettings,
   };
 
   appContent.innerHTML = (renderers[screen] || renderers.dashboard)();
@@ -235,165 +289,306 @@ function screenIntro(title, text, action = "") {
   `;
 }
 
+function renderCompanyStrip() {
+  return `
+    <div class="company-strip">
+      <span><strong>Empresa</strong>Ox Comércio Demonstrativo LTDA</span>
+      <span><strong>CNPJ</strong>12.345.678/0001-90</span>
+      <span><strong>Cidade</strong>Maringá/PR</span>
+      <span><strong>Plano</strong>Business</span>
+    </div>
+  `;
+}
+
+function renderFilters(filters = commonFilters) {
+  return `
+    <div class="filter-bar dense">
+      ${filters.map((filter) => `<label>${filter}<input type="text" value="${defaultFilterValue(filter)}" /></label>`).join("")}
+      <button class="primary-button compact-button" type="button" data-action="apply-filters">Aplicar filtros</button>
+      <button class="secondary-button compact-button" type="button" data-action="clear-filters">Limpar</button>
+      <button class="secondary-button compact-button" type="button" data-action="export-report">Exportar relatório</button>
+    </div>
+  `;
+}
+
+function defaultFilterValue(filter) {
+  const values = {
+    "Período": "01/06/2026 a 15/06/2026",
+    "Empresa/CNPJ": "Ox Comércio Demonstrativo LTDA",
+    "Empresa": "Ox Comércio Demonstrativo LTDA",
+    "Loja": "Todas",
+    "Operadora": "Todas",
+    "Banco": "Todos",
+    "Canal": "Todos",
+    "Status": "Todos",
+  };
+  return values[filter] || "Todos";
+}
+
+function actionFor(label) {
+  const value = normalize(label);
+  if (value.includes("importar") || value.includes("nova importacao")) return "import-file";
+  if (value.includes("validar layout")) return "validate-layout";
+  if (value.includes("mapear")) return "map-columns";
+  if (value === "processar") return "process-file";
+  if (value.includes("reprocessar")) return "reprocess";
+  if (value.includes("baixar")) return "download";
+  if (value.includes("historico")) return "history";
+  if (value.includes("abrir chamado") || value.includes("solicitar analise") || value.includes("validacao tecnica")) return "open-ticket";
+  if (value.includes("ver detalhes") || value.includes("ver regra")) return "open-drawer";
+  if (value.includes("perguntar")) return "ask-ai";
+  if (value.includes("confirmar fraude")) return "confirm-fraud";
+  if (value.includes("descartar")) return "discard-suspicion";
+  if (value.includes("ignorar")) return "ignore-justification";
+  if (value.includes("conciliar automaticamente")) return "auto-reconcile";
+  if (value.includes("conciliar manualmente") || value.includes("conciliar deposito") || value.includes("conciliar selecionadas") || value.includes("conciliar pedidos")) return "open-drawer";
+  if (value.includes("aprovar ajuste")) return "approve-adjustment";
+  if (value.includes("exportar") || value.includes("gerar relatorio") || value.includes("enviar por e-mail") || value.includes("agendar")) return "export-report";
+  if (value.includes("criar regra") || value.includes("criar de-para") || value.includes("aplicar regra")) return "create-rule";
+  if (value.includes("anexar")) return "attach-file";
+  if (value.includes("salvar")) return "save-settings";
+  if (value.includes("conectar")) return "connect-source";
+  return "generic-action";
+}
+
+function renderActions(actions = []) {
+  if (!actions.length) return "";
+  return `
+    <div class="toolbar action-strip">
+      ${actions.map((label, index) => {
+        const primary = index === 0 || normalize(label).includes("automaticamente") || normalize(label).includes("gerar");
+        return `<button class="${primary ? "primary-button" : "secondary-button"} compact-button" type="button" data-action="${actionFor(label)}" data-label="${label}">${label}</button>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function detailButton(label = "Ver detalhes", title = "Registro em análise") {
+  return `<button class="row-action" type="button" data-action="open-drawer" data-title="${title}">${label}</button>`;
+}
+
+function renderTable(headers, rows) {
+  return `
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${rows.map((row) => {
+            const needsAction = headers.includes("Ação");
+            const cells = row.map((cell, index) => {
+              const header = headers[index] || "";
+              const shouldPill = /status|classificação|classificacao|risco|prioridade|nível|nivel/i.test(header);
+              return `<td>${shouldPill ? pill(cell) : cell}</td>`;
+            });
+            if (needsAction && row.length < headers.length) cells.push(`<td>${detailButton()}</td>`);
+            return `<tr>${cells.join("")}</tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderDashboard() {
   return `
-    ${screenIntro("Clareza operacional", "Dados financeiros só geram valor quando a empresa consegue confiar neles. Aqui o time vê o que está certo, o que está divergente e o que precisa de atenção.")}
+    ${renderCompanyStrip()}
+    ${screenIntro("Clareza operacional", "Empresas vendem todos os dias, mas precisam confiar que venderam, cobraram, tributaram, receberam e conciliaram tudo corretamente.", renderActions(["Nova importação", "Ver divergências", "Ver boletos suspeitos", "Gerar relatório", "Perguntar à IA"]))}
+    ${renderFilters(commonFilters)}
     <div class="kpi-grid">
-      ${kpis
-        .map(
-          ([label, value, note]) => `
-          <article class="stat-card">
-            <span>${label}</span>
-            <strong>${value}</strong>
-            <small>${note}</small>
-          </article>
-        `
-        )
-        .join("")}
+      ${dashboardKpis.map(([label, value, note]) => `
+        <article class="stat-card">
+          <span>${label}</span>
+          <strong>${value}</strong>
+          <small>${note}</small>
+        </article>
+      `).join("")}
     </div>
     <div class="dashboard-grid">
       <article class="chart-card">
-        <h3>Vendas x Recebimentos</h3>
+        <h3>Vendas x recebimentos por dia</h3>
         <div class="bar-chart">
           ${[
-            ["Jan", 88, "R$ 82,4 mil"],
-            ["Fev", 72, "R$ 77,1 mil"],
-            ["Mar", 94, "R$ 95,8 mil"],
-            ["Abr", 79, "R$ 84,6 mil"],
-            ["Mai", 91, "R$ 101,2 mil"],
-            ["Jun", 86, "R$ 117,4 mil"],
-          ]
-            .map(
-              ([month, width, value]) => `
-              <div class="bar-row">
-                <span>${month}</span>
-                <span class="bar-track"><i style="width:${width}%"></i></span>
-                <strong>${value}</strong>
-              </div>
-            `
-            )
-            .join("")}
+            ["01/06", 78, "R$ 42,1 mil"],
+            ["03/06", 92, "R$ 51,4 mil"],
+            ["05/06", 63, "R$ 31,8 mil"],
+            ["07/06", 88, "R$ 47,9 mil"],
+            ["10/06", 74, "R$ 39,6 mil"],
+            ["15/06", 96, "R$ 57,2 mil"],
+          ].map(([day, width, value]) => `
+            <div class="bar-row">
+              <span>${day}</span>
+              <span class="bar-track"><i style="width:${width}%"></i></span>
+              <strong>${value}</strong>
+            </div>
+          `).join("")}
         </div>
       </article>
       <article class="chart-card">
-        <h3>Status das conciliações</h3>
+        <h3>Status da conciliação</h3>
         <div class="donut-wrap">
-          <div class="donut" aria-label="78% conciliado"></div>
+          <div class="donut" aria-label="Status das conciliações"></div>
           <div class="legend">
             <span><em><i style="background:#c0dcca"></i>Conciliado</em><strong>78%</strong></span>
             <span><em><i style="background:#ffb547"></i>Divergente</em><strong>12%</strong></span>
-            <span><em><i style="background:#ff5d5d"></i>Risco alto</em><strong>10%</strong></span>
+            <span><em><i style="background:#ff5d5d"></i>Não encontrado</em><strong>6%</strong></span>
+            <span><em><i style="background:#18a7ff"></i>Em análise</em><strong>4%</strong></span>
           </div>
         </div>
       </article>
     </div>
     <div class="dashboard-grid">
       <article class="chart-card">
-        <h3>Distribuição por fonte</h3>
+        <h3>Divergências por origem</h3>
         <div class="source-grid">
-          <span><strong>42%</strong> Operadoras</span>
-          <span><strong>27%</strong> Bancos</span>
-          <span><strong>18%</strong> ERP</span>
-          <span><strong>8%</strong> E-commerce</span>
-          <span><strong>3%</strong> NFC-e</span>
-          <span><strong>2%</strong> Planilhas</span>
+          <span><strong>31</strong> ERP/PDV</span>
+          <span><strong>24</strong> Operadoras</span>
+          <span><strong>18</strong> Banco</span>
+          <span><strong>9</strong> Boletos</span>
+          <span><strong>7</strong> NFC-e</span>
+          <span><strong>5</strong> E-commerce</span>
         </div>
       </article>
       <article class="chart-card">
-        <h3>Próximas ações</h3>
+        <h3>Top 5 operadoras com diferença</h3>
         <div class="ticket-list">
-          <div class="ticket-item"><strong>Revisar boletos suspeitos</strong><span>12 registros marcados por regra de segurança.</span></div>
-          <div class="ticket-item"><strong>Validar taxas divergentes</strong><span>R$ 221,40 de diferença estimada neste ciclo.</span></div>
-          <div class="ticket-item"><strong>Confirmar pagamentos pendentes</strong><span>34 pendências aguardando liquidação ou análise.</span></div>
+          <div class="ticket-item"><strong>Rede</strong><span>R$ 390,50 em diferenças de taxa e lote.</span></div>
+          <div class="ticket-item"><strong>Stone</strong><span>R$ 198,30 em taxa cobrada acima do cadastro.</span></div>
+          <div class="ticket-item"><strong>Mercado Pago</strong><span>Chargebacks e reembolsos pendentes de vínculo.</span></div>
+          <div class="ticket-item"><strong>Getnet</strong><span>Depósitos agrupados por lote bancário.</span></div>
+          <div class="ticket-item"><strong>Pagar.me</strong><span>Pedidos cancelados com pagamento aprovado.</span></div>
         </div>
       </article>
     </div>
     <article class="table-card">
-      <h3>Conciliações recentes</h3>
-      ${renderTable(tables.reconciliations.headers, tables.reconciliations.rows)}
+      <h3>Boletos por classificação de risco</h3>
+      ${renderTable(["Classificação", "Quantidade", "Valor", "Ação recomendada"], [
+        ["Conciliado", "186", "R$ 122.430,00", "Nenhuma"],
+        ["Divergente", "3", "R$ 1.410,00", "Conferir baixa parcial"],
+        ["Suspeito", "6", "R$ 4.890,00", "Revisar beneficiário e linha digitável"],
+        [state.fraudConfirmed ? "Fraude confirmada" : "Possível fraude", "2", "R$ 2.400,00", "Validar com banco/ERP"],
+      ])}
     </article>
   `;
 }
 
 function renderImports() {
   return `
-    ${screenIntro("Importações", "Envie arquivos CSV, Excel, CNAB ou OFX para que a OxNexus organize os dados antes da conciliação.")}
+    ${screenIntro("Importações", "Simule a entrada manual de arquivos financeiros. Não conseguimos interpretar esse arquivo? Mapeie a coluna correta ou envie para análise técnica.", renderActions(["Importar arquivo", "Validar layout", "Mapear colunas", "Processar", "Reprocessar", "Baixar modelo CSV", "Ver histórico", "Abrir chamado técnico"]))}
     <div class="upload-panel">
       <div>
-        <strong>Importar arquivo financeiro</strong>
-        <p>Tipos aceitos: CSV, Excel, CNAB, OFX.</p>
+        <strong>Tipos aceitos</strong>
+        <p>Vendas ERP/PDV, transações de operadora, agenda de recebíveis, extrato bancário, CNAB, OFX, boletos, NFC-e, e-commerce e taxas contratadas.</p>
       </div>
       <button class="primary-button" type="button" data-action="import-file">Importar arquivo</button>
     </div>
     <article class="table-card">
       <h3>Arquivos importados</h3>
-      ${renderTable(["Nome do arquivo", "Tipo", "Data", "Registros", "Status"], state.imports)}
+      ${renderTable(["Nome do arquivo", "Tipo", "Origem", "Data de upload", "Registros lidos", "Registros válidos", "Registros com erro", "Status", "Usuário", "Ação"], state.imports)}
     </article>
   `;
 }
 
-function renderTableScreen(title, text, tableData) {
+function renderDataScreen(id) {
+  const table = tables[id];
   return `
-    ${screenIntro(title, text)}
+    ${screenIntro(table.description, "Identificamos o que está certo, o que está divergente e o que precisa de atenção. Menos conferência manual, mais confiança nos dados.")}
+    ${renderFilters(table.filters)}
+    ${renderActions(table.actions)}
     <article class="table-card">
-      <h3>${title}</h3>
-      ${renderTable(tableData.headers, tableData.rows)}
+      <h3>${screens.find((item) => item.id === id)?.title || "Dados"}</h3>
+      ${renderTable(table.headers, table.rows)}
     </article>
   `;
 }
 
 function renderBoletos() {
+  const table = tables.boletos;
   return `
-    ${screenIntro("Boletos em análise", "Esse boleto foi marcado como suspeito por regra de segurança. Revise beneficiário, valor, vencimento e vínculo interno antes de confirmar a conciliação.")}
+    ${screenIntro(table.description, "Esse boleto foi marcado como suspeito por regra de segurança. Revise os dados antes de confirmar a conciliação.")}
+    ${renderFilters(table.filters)}
+    ${renderActions(table.actions)}
     <div class="mini-card-grid">
       <article class="mini-card"><span>Conciliados</span><strong>186</strong></article>
-      <article class="mini-card"><span>Divergentes</span><strong>24</strong></article>
-      <article class="mini-card"><span>Suspeitos</span><strong>12</strong></article>
-      <article class="mini-card"><span>Possível fraude</span><strong>3</strong></article>
-      <article class="mini-card"><span>Em aberto</span><strong>41</strong></article>
+      <article class="mini-card"><span>Divergentes</span><strong>3</strong></article>
+      <article class="mini-card"><span>Suspeitos</span><strong>6</strong></article>
+      <article class="mini-card"><span>Possíveis fraudes</span><strong>2</strong></article>
+      <article class="mini-card"><span>Em análise</span><strong>4</strong></article>
     </div>
     <article class="table-card">
       <h3>Boletos</h3>
-      ${renderTable(tables.boletos.headers, tables.boletos.rows)}
+      ${renderTable(table.headers, table.rows)}
     </article>
   `;
 }
 
 function renderReconciliations() {
+  const table = tables.reconciliations;
   return `
-    ${screenIntro("Conciliações", "Revise os dados antes de confirmar a conciliação. A IA pode ajudar a entender cada divergência.")}
-    <div class="filter-bar">
-      <label>Tipo<select><option>Todos</option><option>Venda</option><option>Boleto</option><option>Pagamento</option></select></label>
-      <label>Status<select><option>Todos</option><option>Divergente</option><option>Conciliado</option><option>Possível fraude</option></select></label>
-      <label>Período<input type="text" value="Últimos 30 dias" /></label>
-      <label>Valor<input type="text" value="Acima de R$ 100,00" /></label>
-      <label>Empresa<select><option>Todos os CNPJs</option><option>Matriz</option><option>Filial SP</option></select></label>
-    </div>
+    ${screenIntro(table.description, "A tela central cruza origem, valor esperado, valor encontrado, diferença, confiança e ação recomendada.")}
+    ${renderFilters(table.filters)}
+    ${renderActions(table.actions)}
     <article class="table-card">
-      <h3>Registros conciliados e divergentes</h3>
-      ${renderTable(tables.reconciliations.headers, tables.reconciliations.rows)}
+      <h3>Conciliações</h3>
+      ${renderTable(table.headers, table.rows)}
+    </article>
+    <article class="table-card" style="margin-top:14px">
+      <h3>Regras de negócio simuladas</h3>
+      <ul class="business-rules">
+        <li><strong>Venda conciliada:</strong> mesmo NSU, autorização, valor e data aproximada.</li>
+        <li><strong>Venda divergente:</strong> correspondência encontrada, mas valor, bandeira, parcela ou operadora diferente.</li>
+        <li><strong>Pagamento conciliado:</strong> valor líquido previsto bate com depósito bancário.</li>
+        <li><strong>Pagamento divergente:</strong> diferença maior que R$ 0,10.</li>
+        <li><strong>Taxa divergente:</strong> taxa cobrada maior que taxa contratada.</li>
+        <li><strong>Possível fraude:</strong> beneficiário, conta bancária ou linha digitável diferente do esperado.</li>
+      </ul>
     </article>
   `;
 }
 
 function renderAntifraud() {
   const alerts = [
-    ["Alerta 001", "Beneficiário divergente", "Possível fraude"],
-    ["Alerta 002", "Valor diferente", "Divergente"],
-    ["Alerta 003", "Duplicidade encontrada", "Suspeito"],
+    ["ALT-001", "Beneficiário divergente", "100246", "Beneficiário informado não corresponde ao cadastro", "Alto", "R$ 1.200,00", "Validar com banco/ERP", state.fraudConfirmed ? "Fraude confirmada" : "Pendente"],
+    ["ALT-002", "Duplicidade", "100251", "Nosso número repetido", "Médio", "R$ 680,00", "Revisar emissão", "Em análise"],
+    ["ALT-003", "Valor divergente", "100247", "Valor pago menor que emitido", "Médio", "R$ 50,00", "Conferir baixa parcial", "Pendente"],
   ];
   return `
-    ${screenIntro("Antifraude", "A OxNexus prioriza alertas que podem impactar o caixa. Cada regra mostra por que o boleto ou registro merece atenção.")}
+    ${screenIntro("Antifraude", "Tela focada em riscos, alertas e análise de boletos suspeitos.", renderActions(["Rodar análise", "Ver regras aplicadas", "Confirmar fraude", "Marcar como falso positivo", "Solicitar validação técnica", "Exportar dossiê", "Perguntar à IA"]))}
     <div class="mini-card-grid">
-      <article class="mini-card"><span>Beneficiário divergente</span><strong>3</strong></article>
-      <article class="mini-card"><span>Valor divergente</span><strong>7</strong></article>
-      <article class="mini-card"><span>Linha digitável suspeita</span><strong>2</strong></article>
-      <article class="mini-card"><span>Duplicidade</span><strong>5</strong></article>
-      <article class="mini-card"><span>Pago sem registro interno</span><strong>4</strong></article>
+      <article class="mini-card"><span>Alertas ativos</span><strong>11</strong></article>
+      <article class="mini-card"><span>Possíveis fraudes</span><strong>2</strong></article>
+      <article class="mini-card"><span>Boletos suspeitos</span><strong>6</strong></article>
+      <article class="mini-card"><span>Divergências de valor</span><strong>3</strong></article>
+      <article class="mini-card"><span>Duplicidades</span><strong>1</strong></article>
     </div>
     <article class="table-card">
       <h3>Lista de alertas</h3>
-      ${renderTable(["Alerta", "Regra aplicada", "Classificação", "Ação"], alerts)}
+      ${renderTable(["Alerta", "Tipo", "Boleto", "Regra acionada", "Nível de risco", "Valor", "Ação recomendada", "Status", "Ação"], alerts)}
+    </article>
+  `;
+}
+
+function renderReports() {
+  return `
+    ${screenIntro("Relatórios", "A OxNexus não promete valor. Ela prova o valor entregue.", renderActions(["Gerar relatório mensal", "Exportar PDF", "Exportar Excel", "Enviar por e-mail", "Agendar envio", "Ver histórico"]))}
+    <div class="mini-card-grid">
+      <article class="mini-card"><span>Horas manuais antes</span><strong>42h/mês</strong></article>
+      <article class="mini-card"><span>Horas após OxNexus</span><strong>12h/mês</strong></article>
+      <article class="mini-card"><span>Redução estimada</span><strong>30h/mês</strong></article>
+      <article class="mini-card"><span>Valor divergente</span><strong>R$ 8.430,30</strong></article>
+      <article class="mini-card"><span>Relatórios gerados</span><strong>18</strong></article>
+    </div>
+    <article class="table-card">
+      <h3>Modelos disponíveis</h3>
+      ${renderTable(["Relatório", "Foco", "Periodicidade", "Status", "Ação"], [
+        ["Resumo de conciliação", "Executivo", "Mensal", "Finalizado"],
+        ["Divergências por operadora", "Operadoras", "Semanal", "Em análise"],
+        ["Taxas cobradas a maior", "Taxas", "Mensal", "Finalizado"],
+        ["Boletos suspeitos", "Antifraude", "Diário", "Finalizado"],
+        ["Depósitos não identificados", "Banco", "Semanal", "Pendente"],
+        ["Economia estimada", "Valor entregue", "Mensal", "Finalizado"],
+      ])}
     </article>
   `;
 }
@@ -415,10 +610,14 @@ function renderAi() {
       <aside class="ai-panel">
         <h3>Perguntas rápidas</h3>
         <div class="quick-questions">
-          <button type="button" data-question="Por que esse boleto está suspeito?">Por que esse boleto está suspeito?</button>
-          <button type="button" data-question="O que significa status divergente?">O que significa status divergente?</button>
-          <button type="button" data-question="Como corrigir uma taxa divergente?">Como corrigir uma taxa divergente?</button>
-          <button type="button" data-question="Como funciona a conciliação de vendas?">Como funciona a conciliação de vendas?</button>
+          ${[
+            "Por que esse boleto está suspeito?",
+            "O que significa venda não encontrada?",
+            "Como corrigir taxa divergente?",
+            "Por que o depósito está diferente do recebível?",
+            "Como funciona a conciliação automática?",
+            "Como abrir um chamado técnico?",
+          ].map((question) => `<button type="button" data-question="${question}">${question}</button>`).join("")}
         </div>
       </aside>
     </div>
@@ -427,28 +626,19 @@ function renderAi() {
 
 function renderSupport() {
   return `
-    ${screenIntro("Suporte", "Abra solicitações com contexto financeiro, categoria e status para acompanhar o atendimento sem perder histórico.")}
+    ${screenIntro("Suporte", "Abra solicitações com contexto financeiro, categoria, prioridade e registro relacionado.", renderActions(["Abrir chamado", "Anexar comprovante", "Solicitar reprocessamento", "Enviar dúvida", "Ver chamados", "Fechar chamado"]))}
     <div class="support-layout">
       <form class="form-panel" id="ticketForm">
         <h3>Abrir solicitação</h3>
-        <label>Categoria<select name="category"><option>Dúvida</option><option>Erro de importação</option><option>Divergência financeira</option><option>Solicitação de novo CNPJ</option><option>Solicitação de nova operadora</option></select></label>
-        <label>Resumo<input name="summary" value="Preciso revisar uma divergência financeira" /></label>
+        <label>Categoria<select name="category"><option>Dúvida de uso</option><option>Erro de importação</option><option>Divergência financeira</option><option>Boleto suspeito</option><option>Novo CNPJ</option><option>Nova operadora</option><option>Problema técnico</option></select></label>
+        <label>Prioridade<select name="priority"><option>Média</option><option>Alta</option><option>Baixa</option></select></label>
+        <label>Registro relacionado<input name="related" value="Boleto 100246" /></label>
+        <label>Descrição<input name="summary" value="Preciso revisar uma divergência financeira" /></label>
         <button class="primary-button full" type="submit">Abrir chamado</button>
       </form>
       <article class="support-card">
         <h3>Lista de chamados</h3>
-        <div class="ticket-list">
-          ${state.tickets
-            .map(
-              ([code, category, status, text]) => `
-              <div class="ticket-item">
-                <strong>${code} - ${category}</strong>
-                <span>${pill(status)} ${text}</span>
-              </div>
-            `
-            )
-            .join("")}
-        </div>
+        ${renderTable(["Chamado", "Categoria", "Prioridade", "Status", "Responsável", "Última atualização"], state.tickets)}
       </article>
     </div>
   `;
@@ -456,81 +646,116 @@ function renderSupport() {
 
 function renderTechnical() {
   return `
-    ${screenIntro("Tela técnica", "Área reservada para perfis técnicos acompanharem logs, regras aplicadas e reprocessamentos.", '<button class="primary-button compact-button" type="button" data-action="reprocess">Reprocessar</button>')}
+    ${screenIntro("Área técnica", "Apenas para analista técnico. Acompanhe logs, mapeamentos, erros de layout e histórico de reprocessamento.", renderActions(["Ver logs", "Reprocessar arquivo", "Baixar arquivo original", "Ver regra aplicada", "Alterar mapeamento", "Criar de-para", "Reabrir processamento", "Marcar como resolvido"]))}
     <div class="technical-grid">
       <article class="technical-card">
         <h3>Logs de importação</h3>
         <div class="log-list">
-          <div class="log-item"><strong>retorno_cnab_341.ret</strong><span>Regra CNAB aplicada. 18 divergências encontradas.</span></div>
-          <div class="log-item"><strong>boletos_gateway.xlsx</strong><span>Não conseguimos interpretar esse arquivo. Verifique se o layout está correto ou envie para análise técnica.</span></div>
-          <div class="log-item"><strong>extrato_conta_237.ofx</strong><span>Arquivo processado com 928 registros e 6 pendências de vínculo.</span></div>
+          <div class="log-item"><strong>boletos_emitidos.csv</strong><span>Não conseguimos identificar a coluna NSU neste arquivo. Mapeie a coluna correta ou envie para análise técnica.</span></div>
+          <div class="log-item"><strong>cielo_recebiveis_junho.csv</strong><span>5 registros foram importados com divergência de taxa.</span></div>
+          <div class="log-item"><strong>extrato_itau_0106.ofx</strong><span>96 registros lidos e 1 depósito marcado como não identificado.</span></div>
         </div>
       </article>
       <article class="technical-card">
         <h3>Regras aplicadas</h3>
         <div class="log-list">
-          <div class="log-item"><strong>Beneficiário autorizado</strong><span>Compara beneficiário do boleto com cadastro da empresa.</span></div>
-          <div class="log-item"><strong>Tolerância de taxa</strong><span>Diferenças acima de R$ 0,10 entram na fila de revisão.</span></div>
-          <div class="log-item"><strong>Duplicidade bancária</strong><span>Localiza registros com mesmo valor, vencimento e pagador.</span></div>
+          <div class="log-item"><strong>NSU + autorização</strong><span>Usada para conciliar venda ERP/PDV com transação da operadora.</span></div>
+          <div class="log-item"><strong>Tolerância R$ 0,10</strong><span>Diferença acima desse valor entra na fila de análise.</span></div>
+          <div class="log-item"><strong>Beneficiário autorizado</strong><span>Compara beneficiário informado com cadastro da empresa.</span></div>
         </div>
       </article>
     </div>
     <article class="table-card" style="margin-top:14px">
-      <h3>Registros divergentes</h3>
-      ${renderTable(tables.reconciliations.headers, tables.reconciliations.rows)}
+      <h3>Histórico de reprocessamento</h3>
+      ${renderTable(["Arquivo", "Regra", "Antes", "Depois", "Status", "Ação"], [
+        ["cielo_recebiveis_junho.csv", "Taxa contratada", "5 erros", "2 erros", "Corrigido"],
+        ["boletos_emitidos.csv", "Mapeamento NSU", "4 erros", "Reprocessando", "Reprocessando"],
+        ["extrato_itau_0106.ofx", "Vínculo por lote", "1 pendência", "1 pendência", "Em análise"],
+      ])}
     </article>
   `;
 }
 
 function renderSettings() {
   return `
-    ${screenIntro("Configurações", "Defina dados da empresa, usuários, permissões, contas bancárias e parâmetros de conciliação.")}
+    ${screenIntro("Configurações", "Defina dados da empresa, usuários, permissões, contas bancárias, taxas e parâmetros de risco.", renderActions(["Salvar alterações", "Adicionar empresa", "Adicionar CNPJ", "Adicionar usuário", "Cadastrar conta bancária", "Cadastrar taxa", "Configurar tolerância", "Ativar notificações"]))}
     <div class="settings-grid">
       <article class="setting-card">
-        <h3>Dados e permissões</h3>
+        <h3>Dados mockados obrigatórios</h3>
         <div class="settings-list">
-          <div class="settings-item"><strong>Empresa</strong><span>OxNexus Demonstração Ltda - CNPJ 12.345.678/0001-90</span></div>
-          <div class="settings-item"><strong>Usuários</strong><span>8 usuários ativos, 2 administradores.</span></div>
-          <div class="settings-item"><strong>Permissões</strong><span>Financeiro, auditoria, técnico e leitura executiva.</span></div>
-          <div class="settings-item"><strong>Contas bancárias</strong><span>Itaú, Bradesco, Banco do Brasil e Santander.</span></div>
+          <div class="settings-item"><strong>Empresa</strong><span>Ox Comércio Demonstrativo LTDA - 12.345.678/0001-90 - Maringá/PR - Plano Business</span></div>
+          <div class="settings-item"><strong>Usuários</strong><span>Gabriel de Melo, Samuel Yuiti, Mateus Sobral, Lucas Henrique e Tiago Schult.</span></div>
+          <div class="settings-item"><strong>Operadoras</strong><span>Cielo, Rede, Stone, Getnet, Mercado Pago e Pagar.me.</span></div>
+          <div class="settings-item"><strong>Bancos</strong><span>Itaú, Sicredi, Banco do Brasil e Caixa.</span></div>
+          <div class="settings-item"><strong>Canais</strong><span>Loja física, e-commerce, marketplace, boleto, Pix, cartão crédito e cartão débito.</span></div>
         </div>
       </article>
       <form class="setting-card settings-form">
         <h3>Parâmetros de conciliação</h3>
         <label>Tolerância de diferença<input value="R$ 0,10" /></label>
-        <label>Notificações<select><option>Ativas para divergências e risco alto</option><option>Apenas risco alto</option><option>Desativadas</option></select></label>
-        <label>Conciliação automática<select><option>Ativar quando não houver divergência</option><option>Exigir aprovação manual</option></select></label>
-        <button class="primary-button full" type="button" data-action="save-settings">Salvar configurações</button>
+        <label>Notificações por e-mail<select><option>Ativas para divergências e risco alto</option><option>Apenas risco alto</option><option>Desativadas</option></select></label>
+        <label>Parâmetros de risco<select><option>Beneficiário, conta, linha digitável e duplicidade</option><option>Somente risco alto</option></select></label>
+        <button class="primary-button full" type="button" data-action="save-settings">Salvar alterações</button>
       </form>
     </div>
   `;
 }
 
-function renderTable(headers, rows) {
-  return `
-    <div class="data-table-wrap">
-      <table class="data-table">
-        <thead>
-          <tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr>
-        </thead>
-        <tbody>
-          ${rows
-            .map((row) => {
-              const actionNeeded = headers.some((header) => header === "Ação");
-              const baseCells = row.map((cell, index) => {
-                const isStatusColumn = /status|classificação/i.test(headers[index] || "");
-                return `<td>${isStatusColumn ? pill(cell) : cell}</td>`;
-              });
-              if (actionNeeded && row.length < headers.length) {
-                baseCells.push(`<td>${detailButton()}</td>`);
-              }
-              return `<tr>${baseCells.join("")}</tr>`;
-            })
-            .join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
+function openDrawer(title = "Registro em análise") {
+  drawerTitle.textContent = title;
+  drawerText.textContent = "Encontramos divergências que precisam da sua atenção. Revise os dados antes de confirmar a conciliação.";
+  drawer.classList.remove("hidden");
+}
+
+function openModal(title, body, footer = "") {
+  modalTitle.textContent = title;
+  modalBody.innerHTML = body;
+  modalFooter.innerHTML = footer || `<button class="primary-button compact-button" type="button" data-action="close-modal">Entendi</button>`;
+  actionModal.classList.remove("hidden");
+}
+
+function openUploadModal() {
+  openModal(
+    "Importar arquivo",
+    `
+      <p>Selecione o tipo de arquivo e simule o envio. O protótipo não envia dados reais.</p>
+      <label>Tipo de arquivo<select><option>Vendas ERP/PDV</option><option>Transações de operadora</option><option>Agenda de recebíveis</option><option>Extrato bancário</option><option>CNAB</option><option>OFX</option><option>Boletos</option><option>NFC-e</option><option>E-commerce</option><option>Taxas contratadas</option></select></label>
+      <label>Arquivo<input type="text" value="novo_arquivo_demo.csv" /></label>
+      <p>Microtexto: vamos validar layout, mapear colunas e processar apenas dados fictícios.</p>
+    `,
+    `<button class="primary-button compact-button" type="button" data-action="process-file">Processar</button><button class="secondary-button compact-button" type="button" data-action="close-modal">Cancelar</button>`
+  );
+}
+
+function openTicketModal() {
+  openModal(
+    "Abrir chamado",
+    `
+      <label>Categoria<select><option>Divergência financeira</option><option>Erro de importação</option><option>Boleto suspeito</option><option>Novo CNPJ</option><option>Problema técnico</option></select></label>
+      <label>Prioridade<select><option>Média</option><option>Alta</option><option>Baixa</option></select></label>
+      <label>Registro relacionado<input value="NSU 82742" /></label>
+      <label>Descrição<input value="Preciso de apoio para revisar essa divergência." /></label>
+    `,
+    `<button class="primary-button compact-button" type="button" data-action="submit-ticket">Abrir chamado</button><button class="secondary-button compact-button" type="button" data-action="close-modal">Cancelar</button>`
+  );
+}
+
+function openJustificationModal() {
+  openModal(
+    "Ignorar com justificativa",
+    `
+      <p>Informe por que esse registro pode ser ignorado. A justificativa fica no histórico da conciliação.</p>
+      <textarea placeholder="Ex.: diferença autorizada pelo financeiro após validação do lote."></textarea>
+    `,
+    `<button class="primary-button compact-button" type="button" data-action="save-justification">Registrar justificativa</button><button class="secondary-button compact-button" type="button" data-action="close-modal">Cancelar</button>`
+  );
+}
+
+function processImport() {
+  state.imports.unshift(["novo_arquivo_demo.csv", "Vendas ERP/PDV", "PDV", "16/06/2026", "128", "128", "0", "Reprocessando", "Samuel Yuiti"]);
+  actionModal.classList.add("hidden");
+  showToast("Arquivo demonstrativo entrou como Reprocessando.");
+  if (state.screen === "imports") renderScreen("imports");
 }
 
 function askAi(question) {
@@ -548,26 +773,14 @@ function askAi(question) {
 }
 
 function aiAnswer(question) {
-  const q = question.toLowerCase();
-  if (q.includes("boleto")) {
-    return "Esse boleto foi classificado como suspeito porque o beneficiário informado é diferente do beneficiário cadastrado para sua empresa. Revise o beneficiário antes de confirmar o pagamento.";
-  }
-  if (q.includes("divergente") || q.includes("divergência")) {
-    return "Status divergente significa que o valor esperado não bate com o valor encontrado. A diferença pode vir de taxa, atraso de liquidação, reembolso, chargeback ou registro duplicado.";
-  }
-  if (q.includes("taxa")) {
-    return "Para corrigir uma taxa divergente, compare a taxa contratada com a taxa cobrada, valide a bandeira e registre a tratativa com a operadora.";
-  }
-  if (q.includes("venda")) {
-    return "A conciliação de vendas cruza o registro vendido com o pagamento recebido, a taxa cobrada, o documento fiscal e a fonte bancária.";
-  }
-  return "Posso ajudar a entender o motivo da divergência, sugerir a próxima ação e indicar quais dados precisam ser revisados.";
-}
-
-function openDrawer(title = "Registro em análise") {
-  drawerTitle.textContent = title;
-  drawerText.textContent = "Identificamos divergências que precisam de atenção. Revise os dados antes de confirmar a conciliação.";
-  drawer.classList.remove("hidden");
+  const q = normalize(question);
+  if (q.includes("boleto")) return "Esse boleto foi marcado como possível fraude porque o beneficiário informado não corresponde ao beneficiário cadastrado para essa empresa.";
+  if (q.includes("nao encontrada") || q.includes("nao encontrado")) return "Essa venda está como não encontrada porque existe registro em uma origem, mas não localizamos correspondência com mesmo NSU, valor ou data aproximada.";
+  if (q.includes("taxa")) return "A taxa cobrada foi maior que a taxa contratada. Compare bandeira, modalidade e parcelas antes de aprovar o ajuste.";
+  if (q.includes("deposito") || q.includes("recebivel")) return "A diferença no depósito pode estar relacionada a taxa divergente, antecipação, cancelamento, chargeback ou lote bancário agrupado.";
+  if (q.includes("automatica")) return "A conciliação automática usa regras de NSU, autorização, valor, data aproximada e tolerância de R$ 0,10.";
+  if (q.includes("chamado")) return "Abra um chamado informando categoria, prioridade, descrição e o registro relacionado. A área técnica recebe o contexto da tela.";
+  return "Revise a origem do registro, confira valores, NSU, autorização e lote bancário. Se a diferença persistir, abra um chamado técnico.";
 }
 
 function routeFromHash() {
@@ -589,40 +802,73 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const actionTarget = event.target.closest("[data-action]");
-  if (!actionTarget) return;
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
+  const action = target.dataset.action;
+  const label = target.dataset.label || target.textContent.trim();
 
-  const action = actionTarget.dataset.action;
   if (action === "open-login") showLogin();
   if (action === "open-demo") {
     showApp("dashboard");
     showToast("Demonstração carregada com dados fictícios realistas.");
   }
   if (action === "back-home") showLanding("inicio");
-  if (action === "forgot") showToast("Enviamos um fluxo simulado de recuperação para o e-mail de demonstração.");
+  if (action === "forgot") showToast("Fluxo simulado de recuperação enviado para o e-mail de demonstração.");
   if (action === "logout") showLogin();
-  if (action === "nav-screen") showApp(actionTarget.dataset.screen);
+  if (action === "nav-screen") showApp(target.dataset.screen);
   if (action === "toggle-menu") document.querySelector(".sidebar").classList.toggle("open");
-  if (action === "ask-ai") showApp("ai");
   if (action === "technical") showApp("technical");
+  if (action === "ask-ai") showApp("ai");
   if (action === "contact") showToast("Solicitação registrada. Um especialista entraria em contato nesta etapa.");
-  if (action === "import-file") {
-    state.imports.unshift(["novo_arquivo_demo.csv", "CSV", "16/06/2026", "248", "Aguardando análise"]);
-    renderScreen("imports");
-    showToast("Arquivo demonstrativo adicionado à fila de análise.");
+  if (action === "import-file") openUploadModal();
+  if (action === "validate-layout") openModal("Validar layout", "<p>Layout validado com alertas. Não conseguimos interpretar algumas colunas; revise o mapeamento antes de processar.</p>");
+  if (action === "map-columns") openModal("Mapear colunas", "<p>Mapeie NSU, autorização, valor, data, lote, beneficiário e status para melhorar a conciliação.</p>");
+  if (action === "process-file" || action === "reprocess") processImport();
+  if (action === "download") showToast("Download simulado gerado para demonstração.");
+  if (action === "history") openModal("Histórico", "<p>Últimos processamentos: 4 arquivos finalizados, 1 em análise e 1 reprocessando.</p>");
+  if (action === "open-ticket") openTicketModal();
+  if (action === "submit-ticket") {
+    state.tickets.unshift(["CH-1048", "Divergência financeira", "Média", "Aberto", "Samuel Yuiti", "16/06/2026 10:14"]);
+    actionModal.classList.add("hidden");
+    showToast("Chamado aberto com contexto financeiro da tela.");
+    if (state.screen === "support") renderScreen("support");
   }
-  if (action === "open-drawer") openDrawer(actionTarget.dataset.title);
+  if (action === "open-drawer") openDrawer(target.dataset.title || label || "Registro em análise");
   if (action === "close-drawer") drawer.classList.add("hidden");
+  if (action === "close-modal") actionModal.classList.add("hidden");
   if (action === "confirm-review") {
     drawer.classList.add("hidden");
     showToast("Registro marcado como revisado no protótipo.");
   }
+  if (action === "confirm-fraud") {
+    state.fraudConfirmed = true;
+    showToast("Status alterado para Fraude confirmada.");
+    if (["boletos", "antifraud", "reconciliations", "dashboard"].includes(state.screen)) renderScreen(state.screen);
+  }
+  if (action === "discard-suspicion") {
+    state.fraudConfirmed = false;
+    showToast("Suspeita descartada como falso positivo.");
+    if (["boletos", "antifraud", "reconciliations", "dashboard"].includes(state.screen)) renderScreen(state.screen);
+  }
+  if (action === "ignore-justification") openJustificationModal();
+  if (action === "save-justification") {
+    actionModal.classList.add("hidden");
+    showToast("Justificativa registrada no histórico.");
+  }
+  if (action === "auto-reconcile") showToast("Conciliação automática simulada com tolerância de R$ 0,10.");
+  if (action === "approve-adjustment") showToast("Ajuste aprovado no protótipo.");
+  if (action === "export-report") showToast("Relatório simulado gerado para demonstração.");
+  if (action === "create-rule") openModal("Criar regra", "<p>Regra criada para aproximar NSU, autorização, valor e data. O próximo reprocessamento usará esse critério.</p>");
+  if (action === "attach-file") showToast("Comprovante anexado visualmente ao chamado.");
+  if (action === "save-settings") showToast("Configurações salvas no protótipo.");
+  if (action === "connect-source") openModal("Conectar fonte", "<p>Integrações reais não fazem parte desta versão. A fonte fica simulada com dados mockados.</p>");
+  if (action === "apply-filters") showToast("Filtros aplicados aos dados fictícios.");
+  if (action === "clear-filters") showToast("Filtros limpos.");
   if (action === "send-ai") {
     const input = document.querySelector("#aiInput");
     askAi(input ? input.value : "");
   }
-  if (action === "reprocess") showToast("Reprocessamento iniciado. Os registros divergentes seriam atualizados ao final.");
-  if (action === "save-settings") showToast("Configurações salvas no protótipo.");
+  if (action === "generic-action") showToast(`${label} executado visualmente no protótipo.`);
 });
 
 document.querySelector("#loginForm").addEventListener("submit", (event) => {
@@ -642,9 +888,14 @@ prototype.addEventListener("submit", (event) => {
   if (event.target.id !== "ticketForm") return;
   event.preventDefault();
   const form = new FormData(event.target);
-  const category = form.get("category");
-  const summary = form.get("summary");
-  state.tickets.unshift([`CH-${1043 + state.tickets.length}`, category, "Aberto", summary]);
+  state.tickets.unshift([
+    `CH-${1049 + state.tickets.length}`,
+    form.get("category"),
+    form.get("priority"),
+    "Aberto",
+    "Samuel Yuiti",
+    "16/06/2026 10:18",
+  ]);
   renderScreen("support");
   showToast("Chamado aberto com contexto financeiro da tela.");
 });

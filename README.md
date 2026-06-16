@@ -2,7 +2,7 @@
 
 Landing page e protótipo interativo para a OxNexus, uma plataforma SaaS de conciliação financeira inteligente.
 
-A proposta da OxNexus é transformar dados financeiros dispersos em confiança para decisão, ajudando empresas a validarem se aquilo que foi vendido, cobrado, pago e recebido realmente está correto.
+A proposta da OxNexus é transformar dados financeiros dispersos em confiança para decisão, ajudando empresas a validarem se aquilo que foi vendido, cobrado, pago, tributado e recebido realmente está correto.
 
 ## Como abrir
 
@@ -29,9 +29,10 @@ Arquivo de configuração:
 ## O que está incluído
 
 - Landing page responsiva com posicionamento, dor, solução, módulos, antifraude, IA contextual, planos e CTA.
-- Protótipo navegável com login, menu lateral, dashboard, importações, vendas, pagamentos, boletos, taxas, NFC-e, e-commerce, conciliações, antifraude, IA, suporte, tela técnica e configurações.
+- Protótipo navegável com login, menu lateral, dashboard executivo, importações, vendas ERP/PDV, transações de operadora, recebíveis, depósitos bancários, boletos, taxas, NFC-e, e-commerce, conciliações, antifraude, relatórios, IA, suporte, área técnica e configurações.
 - Dados fictícios realistas para demonstração comercial.
-- Ações visuais nos botões principais: entrar, importar arquivo, ver detalhes, reprocessar, abrir chamado, perguntar à IA e salvar configurações.
+- Ações visuais nos botões principais: entrar, importar arquivo, validar layout, mapear colunas, ver detalhes, reprocessar, abrir chamado, perguntar à IA, confirmar fraude, ignorar com justificativa e salvar configurações.
+- Regras de negócio simuladas para vendas conciliadas, divergentes, não encontradas, pagamentos, taxas, boletos, NFC-e e e-commerce.
 - Identidade visual alinhada à marca OxNexus, com paleta escura, destaque teal/verde e aparência de fintech/SaaS.
 
 ## Acesso de demonstração
