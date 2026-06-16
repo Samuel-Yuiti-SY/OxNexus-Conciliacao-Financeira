@@ -186,7 +186,7 @@ Funcionalidades incluídas:
 
 * login demonstrativo;
 * menu lateral navegável;
-* dashboard com indicadores financeiros;
+* dashboard executivo com quatro KPIs principais, gráfico de receita, distribuição por fonte e últimas divergências;
 * filtros por período, empresa, loja, banco, operadora, canal e status;
 * importação simulada de arquivos;
 * validação de layout;
@@ -196,7 +196,7 @@ Funcionalidades incluídas:
 * confirmação de possível fraude;
 * abertura de chamados;
 * reprocessamento visual de dados;
-* consulta à IA contextual;
+* consulta à IA contextual em painel lateral e tela dedicada;
 * geração visual de relatórios;
 * modo de visualização mais limpo;
 * área técnica com logs e regras aplicadas.
@@ -292,6 +292,8 @@ Bancos simulados:
 
 A interface segue a identidade visual da OxNexus, com aparência de fintech/SaaS e foco em clareza, confiança e tecnologia.
 
+A marca aplicada na landing page, login e dashboard utiliza o arquivo `assets/oxnexus-logo.png`, em PNG transparente, sem fundo azul ou bloco de apoio.
+
 Paleta utilizada:
 
 ```txt
@@ -311,7 +313,7 @@ Azul informativo: #18A7FF
 
 ## Publicação na Vercel
 
-O projeto está configurado para publicação como site estático na Vercel.
+O projeto está configurado para publicação como site estático na Vercel, com build gerado pelo Vite.
 
 Arquivo de configuração:
 
@@ -319,15 +321,16 @@ Arquivo de configuração:
 vercel.json
 ```
 
-Esse arquivo define configurações básicas para servir a experiência web com URLs limpas e headers apropriados.
+Esse arquivo define o comando de build, o diretório de saída e configurações básicas para servir a experiência web com URLs limpas e headers apropriados.
 
 Para publicar:
 
 1. Faça o push do projeto para o GitHub.
 2. Acesse a Vercel.
 3. Importe o repositório.
-4. Configure o projeto como site estático.
-5. Publique.
+4. Mantenha o comando de build como `npm run build`.
+5. Mantenha o diretório de saída como `dist`.
+6. Publique.
 
 ---
 
@@ -340,11 +343,12 @@ OxNexus-Conciliacao-Financeira/
 ├── styles.css
 ├── app.js
 ├── package.json
+├── package-lock.json
 ├── vercel.json
 ├── README.md
 │
 └── assets/
-    └── oxnexus-logo-dark.png
+    └── oxnexus-logo.png
 ```
 
 ---

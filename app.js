@@ -23,6 +23,7 @@ const state = {
   focusMode: false,
   filtersVisible: localStorage.getItem("oxnexus.filtersVisible") !== "false",
   filtersBeforeFocus: true,
+  advancedSummaryVisible: localStorage.getItem("oxnexus.advancedSummaryVisible") === "true",
   imports: [
     ["vendas_pdv_01062026.csv", "Vendas ERP/PDV", "PDV", "01/06/2026", "420", "418", "2", "Processado", "Lucas Henrique"],
     ["cielo_recebiveis_junho.csv", "Agenda de recebíveis", "Cielo", "01/06/2026", "385", "380", "5", "Com divergências", "Samuel Yuiti"],
@@ -71,6 +72,38 @@ const dashboardKpis = [
   ["Boletos suspeitos", "6", "Marcados por regra de segurança."],
   ["Possíveis fraudes", "2", "Beneficiário ou conta divergente."],
   ["Taxas divergentes", "R$ 545,15", "Identificamos taxas cobradas acima do cadastro contratado."],
+];
+
+const referenceKpis = [
+  { title: "Vendas", value: "R$ 125.000", variation: "+12,5%", tone: "ok", icon: "VD" },
+  { title: "Pagamentos", value: "R$ 98.000", variation: "+10,2%", tone: "ok", icon: "PG" },
+  { title: "Divergências", value: "128", variation: "-0,7%", tone: "warn", icon: "DV" },
+  { title: "Suspeitos", value: "45", variation: "+5,2%", tone: "danger", icon: "AF" },
+];
+
+const revenueData = [
+  { month: "Jan", value: 72000 },
+  { month: "Fev", value: 81000 },
+  { month: "Mar", value: 76000 },
+  { month: "Abr", value: 92000 },
+  { month: "Mai", value: 88000 },
+  { month: "Jun", value: 105000 },
+];
+
+const sourceDistribution = [
+  { label: "Vendas", value: 42, color: "#24B6AA" },
+  { label: "Pagamentos", value: 28, color: "#C0DCCA" },
+  { label: "Boletos", value: 15, color: "#18A7FF" },
+  { label: "NFC-e", value: 9, color: "#FFB547" },
+  { label: "E-commerce", value: 6, color: "#A178FF" },
+];
+
+const latestDivergences = [
+  ["24/05/2026", "Boleto", "Valor não recebido", "R$ 2.250,00", "Divergente"],
+  ["24/05/2026", "Cartão", "Taxa divergente", "R$ 128,40", "Divergente"],
+  ["24/05/2026", "NFC-e", "Venda sem documento", "R$ 680,00", "Em análise"],
+  ["23/05/2026", "E-commerce", "Pedido cancelado com pagamento", "R$ 940,00", "Suspeito"],
+  ["23/05/2026", "Banco", "Depósito não identificado", "R$ 1.480,00", "Em análise"],
 ];
 
 const commonFilters = ["Período", "Empresa/CNPJ", "Loja", "Operadora", "Banco", "Canal", "Status"];
@@ -322,11 +355,12 @@ function renderCompanyStrip() {
 }
 
 function renderFilters(filters = commonFilters) {
+  const activeSummary = "Filtros ativos: 01/06/2026 a 15/06/2026 • Ox Comércio Demonstrativo LTDA • Todos os status";
   if (state.focusMode) return "";
   if (!state.filtersVisible) {
     return `
       <div class="filters-summary">
-        <span>Filtros ativos: período, empresa, status</span>
+        <span>${activeSummary}</span>
         <button class="secondary-button compact-button" type="button" data-action="toggle-filters">Mostrar filtros</button>
       </div>
     `;
@@ -334,7 +368,7 @@ function renderFilters(filters = commonFilters) {
   return `
     <div class="filters-shell">
       <div class="filters-heading">
-        <span>Filtros ativos: período, empresa, status</span>
+        <span>${activeSummary}</span>
         <button class="secondary-button compact-button" type="button" data-action="toggle-filters">Ocultar filtros</button>
       </div>
       <div class="filter-bar dense">
@@ -365,6 +399,8 @@ function actionFor(label) {
   const value = normalize(label);
   if (value.includes("importar") || value.includes("nova importacao")) return "import-file";
   if (value.includes("validar layout")) return "validate-layout";
+  if (value.includes("ver divergencias")) return "show-divergences";
+  if (value.includes("ver boletos suspeitos")) return "show-suspect-boletos";
   if (value.includes("mapear")) return "map-columns";
   if (value === "processar") return "process-file";
   if (value.includes("reprocessar")) return "reprocess";
@@ -418,7 +454,7 @@ function kpiIcon(label) {
   if (value.includes("operadoras")) return "OP";
   if (value.includes("liquido")) return "R$";
   if (value.includes("banco")) return "BC";
-  if (value.includes("diferenca")) return "Δ";
+  if (value.includes("diferenca")) return "DV";
   if (value.includes("conciliadas")) return "OK";
   if (value.includes("divergentes")) return "!";
   if (value.includes("nao encontradas")) return "?";
@@ -468,88 +504,131 @@ function renderTable(headers, rows) {
   `;
 }
 
-function renderDashboard() {
+function renderLineChart(data) {
+  const width = 620;
+  const height = 230;
+  const padX = 46;
+  const padY = 28;
+  const values = data.map((item) => item.value);
+  const min = Math.min(...values) * 0.92;
+  const max = Math.max(...values) * 1.05;
+  const points = data.map((item, index) => {
+    const x = padX + (index * (width - padX * 2)) / (data.length - 1);
+    const y = height - padY - ((item.value - min) / (max - min)) * (height - padY * 2);
+    return { ...item, x, y };
+  });
+  const path = points.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(" ");
+
   return `
-    ${renderCompanyStrip()}
-    ${screenIntro("Clareza operacional", "Empresas vendem todos os dias, mas precisam confiar que venderam, cobraram, tributaram, receberam e conciliaram tudo corretamente.", renderActions(["Nova importação", "Ver divergências", "Ver boletos suspeitos", "Gerar relatório", "Perguntar à IA", "Exportar PDF", "Exportar Excel", "Atualizar dados", state.focusMode ? "Sair do modo foco" : "Modo foco", state.filtersVisible ? "Ocultar filtros" : "Mostrar filtros", state.sidebarCollapsed ? "Expandir menu" : "Recolher menu"]))}
-    ${renderFilters(commonFilters)}
-    <div class="kpi-grid">
-      ${dashboardKpis.map(([label, value, note]) => `
-        <article class="stat-card ${kpiTone(label)}">
-          <div class="stat-head">
-            <span>${label}</span>
-            <i>${kpiIcon(label)}</i>
-          </div>
-          <strong>${value}</strong>
-          <small>${note}</small>
-        </article>
+    <svg class="line-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Receita por período de janeiro a junho">
+      <defs>
+        <linearGradient id="lineFill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#24B6AA" stop-opacity="0.32" />
+          <stop offset="100%" stop-color="#24B6AA" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <g class="chart-grid-lines">
+        ${[0, 1, 2, 3].map((line) => {
+          const y = padY + (line * (height - padY * 2)) / 3;
+          return `<line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" />`;
+        }).join("")}
+      </g>
+      <polygon points="${padX},${height - padY} ${path} ${width - padX},${height - padY}" fill="url(#lineFill)" />
+      <polyline points="${path}" fill="none" stroke="#24B6AA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+      ${points.map((point) => `
+        <circle cx="${point.x}" cy="${point.y}" r="5" />
+        <text x="${point.x}" y="${height - 6}" text-anchor="middle">${point.month}</text>
       `).join("")}
+    </svg>
+  `;
+}
+
+function renderDonutChart(data) {
+  let start = 0;
+  const stops = data.map((item) => {
+    const end = start + item.value;
+    const segment = `${item.color} ${start}% ${end}%`;
+    start = end;
+    return segment;
+  }).join(", ");
+
+  return `
+    <div class="reference-donut-wrap">
+      <div class="reference-donut" style="background: conic-gradient(${stops});" aria-label="Distribuição por fonte"></div>
+      <div class="reference-legend">
+        ${data.map((item) => `
+          <span><i style="background:${item.color}"></i>${item.label}<strong>${item.value}%</strong></span>
+        `).join("")}
+      </div>
     </div>
-    <div class="dashboard-grid">
-      <article class="chart-card">
-        <h3>Vendas x recebimentos por dia</h3>
-        <div class="bar-chart">
-          ${[
-            ["01/06", 78, "R$ 42,1 mil"],
-            ["03/06", 92, "R$ 51,4 mil"],
-            ["05/06", 63, "R$ 31,8 mil"],
-            ["07/06", 88, "R$ 47,9 mil"],
-            ["10/06", 74, "R$ 39,6 mil"],
-            ["15/06", 96, "R$ 57,2 mil"],
-          ].map(([day, width, value]) => `
-            <div class="bar-row">
-              <span>${day}</span>
-              <span class="bar-track"><i style="width:${width}%"></i></span>
+  `;
+}
+
+function renderAdvancedSummary() {
+  return `
+    <section class="advanced-summary ${state.advancedSummaryVisible ? "open" : ""}">
+      <button class="advanced-summary-toggle" type="button" data-action="toggle-advanced-summary">
+        <span>Resumo avançado</span>
+        <strong>${state.advancedSummaryVisible ? "Ocultar" : "Mostrar"}</strong>
+      </button>
+      ${state.advancedSummaryVisible ? `
+        <div class="advanced-summary-grid">
+          ${dashboardKpis.map(([label, value, note]) => `
+            <article class="advanced-summary-card ${kpiTone(label)}">
+              <span>${label}</span>
               <strong>${value}</strong>
-            </div>
+              <small>${note}</small>
+            </article>
           `).join("")}
         </div>
-      </article>
-      <article class="chart-card">
-        <h3>Status da conciliação</h3>
-        <div class="donut-wrap">
-          <div class="donut" aria-label="Status das conciliações"></div>
-          <div class="legend">
-            <span><em><i style="background:#c0dcca"></i>Conciliado</em><strong>78%</strong></span>
-            <span><em><i style="background:#ffb547"></i>Divergente</em><strong>12%</strong></span>
-            <span><em><i style="background:#ff5d5d"></i>Não encontrado</em><strong>6%</strong></span>
-            <span><em><i style="background:#18a7ff"></i>Em análise</em><strong>4%</strong></span>
+      ` : ""}
+    </section>
+  `;
+}
+
+function renderDashboard() {
+  return `
+    <section class="reference-dashboard">
+      ${renderCompanyStrip()}
+      ${screenIntro("Clareza operacional", "Painel compacto para acompanhar receita, fontes, divergências e sinais de risco da conciliação financeira.", renderActions(["Nova importação", "Ver divergências", "Ver boletos suspeitos", "Gerar relatório", "Exportar PDF", "Exportar Excel", "Perguntar à IA", "Atualizar dados", state.filtersVisible ? "Ocultar filtros" : "Mostrar filtros", state.focusMode ? "Sair do modo foco" : "Modo foco"]))}
+      ${renderFilters(commonFilters)}
+      <div class="reference-kpi-grid">
+        ${referenceKpis.map((item) => `
+          <article class="reference-kpi-card ${item.tone}">
+            <div>
+              <span>${item.title}</span>
+              <strong>${item.value}</strong>
+              <small>${item.variation}</small>
+            </div>
+            <i>${item.icon}</i>
+          </article>
+        `).join("")}
+      </div>
+      <div class="reference-main-grid">
+        <article class="reference-panel revenue-panel">
+          <div class="reference-panel-head">
+            <h3>Receita por Período</h3>
+            <span>Jan - Jun</span>
           </div>
+          ${renderLineChart(revenueData)}
+        </article>
+        <article class="reference-panel source-panel">
+          <div class="reference-panel-head">
+            <h3>Distribuição por Fonte</h3>
+            <span>Base conciliada</span>
+          </div>
+          ${renderDonutChart(sourceDistribution)}
+        </article>
+      </div>
+      <article class="reference-panel divergences-panel">
+        <div class="reference-panel-head">
+          <h3>Últimas Divergências</h3>
+          <button class="secondary-button compact-button" type="button" data-action="expand-table">Expandir tabela</button>
         </div>
+        ${renderTable(["Data", "Origem", "Descrição", "Valor", "Status"], latestDivergences)}
       </article>
-    </div>
-    <div class="dashboard-grid">
-      <article class="chart-card">
-        <h3>Divergências por origem</h3>
-        <div class="source-grid">
-          <span><strong>31</strong> ERP/PDV</span>
-          <span><strong>24</strong> Operadoras</span>
-          <span><strong>18</strong> Banco</span>
-          <span><strong>9</strong> Boletos</span>
-          <span><strong>7</strong> NFC-e</span>
-          <span><strong>5</strong> E-commerce</span>
-        </div>
-      </article>
-      <article class="chart-card">
-        <h3>Top 5 operadoras com diferença</h3>
-        <div class="ticket-list">
-          <div class="ticket-item"><strong>Rede</strong><span>R$ 390,50 em diferenças de taxa e lote.</span></div>
-          <div class="ticket-item"><strong>Stone</strong><span>R$ 198,30 em taxa cobrada acima do cadastro.</span></div>
-          <div class="ticket-item"><strong>Mercado Pago</strong><span>Chargebacks e reembolsos pendentes de vínculo.</span></div>
-          <div class="ticket-item"><strong>Getnet</strong><span>Depósitos agrupados por lote bancário.</span></div>
-          <div class="ticket-item"><strong>Pagar.me</strong><span>Pedidos cancelados com pagamento aprovado.</span></div>
-        </div>
-      </article>
-    </div>
-    <article class="table-card">
-      <h3>Boletos por classificação de risco</h3>
-      ${renderTable(["Classificação", "Quantidade", "Valor", "Ação recomendada"], [
-        ["Conciliado", "186", "R$ 122.430,00", "Nenhuma"],
-        ["Divergente", "3", "R$ 1.410,00", "Conferir baixa parcial"],
-        ["Suspeito", "6", "R$ 4.890,00", "Revisar beneficiário e linha digitável"],
-        [state.fraudConfirmed ? "Fraude confirmada" : "Possível fraude", "2", "R$ 2.400,00", "Validar com banco/ERP"],
-      ])}
-    </article>
+      ${renderAdvancedSummary()}
+    </section>
   `;
 }
 
@@ -766,10 +845,59 @@ function renderSettings() {
   `;
 }
 
+function resetDrawerPrimary(action = "confirm-review", label = "Marcar como revisado") {
+  const drawerPrimary = drawer.querySelector(".primary-button.full");
+  if (!drawerPrimary) return;
+  drawerPrimary.dataset.action = action;
+  drawerPrimary.textContent = label;
+}
+
+function renderDefaultDrawerList() {
+  const drawerList = drawer.querySelector(".drawer-list");
+  if (!drawerList) return;
+  drawerList.innerHTML = `
+    <span>Valor esperado: R$ 4.920,00</span>
+    <span>Valor encontrado: R$ 4.874,80</span>
+    <span>Diferença: R$ 45,20</span>
+    <span>Ação recomendada: revisar taxa cobrada</span>
+  `;
+}
+
 function openDrawer(title = "Registro em análise") {
+  drawer.classList.remove("ai-drawer");
   drawerTitle.textContent = title;
   drawerText.textContent = "Encontramos divergências que precisam da sua atenção. Revise os dados antes de confirmar a conciliação.";
+  renderDefaultDrawerList();
+  resetDrawerPrimary();
   drawer.classList.remove("hidden");
+}
+
+function openAiDrawer() {
+  drawer.classList.add("ai-drawer");
+  drawerTitle.textContent = "IA OxNexus";
+  drawerText.textContent = "Faça uma pergunta sobre o dashboard atual ou use uma das perguntas rápidas para explicar divergências, boletos e recebíveis.";
+  const drawerList = drawer.querySelector(".drawer-list");
+  if (drawerList) {
+    drawerList.innerHTML = `
+      <div class="drawer-chat-message ai">Estou analisando os dados demonstrativos de 01/06/2026 a 15/06/2026. Escolha uma pergunta ou abra a tela completa da IA.</div>
+      <button class="drawer-question" type="button" data-ai-drawer-question="Quais divergências precisam de atenção hoje?">Quais divergências precisam de atenção hoje?</button>
+      <button class="drawer-question" type="button" data-ai-drawer-question="Por que existem boletos suspeitos?">Por que existem boletos suspeitos?</button>
+      <button class="drawer-question" type="button" data-ai-drawer-question="Como reduzir diferença entre ERP e banco?">Como reduzir diferença entre ERP e banco?</button>
+    `;
+  }
+  resetDrawerPrimary("ask-ai-screen", "Abrir tela completa da IA");
+  drawer.classList.remove("hidden");
+}
+
+function answerAiDrawer(question) {
+  const drawerList = drawer.querySelector(".drawer-list");
+  if (!drawerList) return;
+  drawerList.innerHTML = `
+    <div class="drawer-chat-message user">${question}</div>
+    <div class="drawer-chat-message ai">${aiAnswer(question)}</div>
+    <button class="drawer-question" type="button" data-ai-drawer-question="Quais divergências precisam de atenção hoje?">Perguntar sobre divergências</button>
+    <button class="drawer-question" type="button" data-ai-drawer-question="Por que existem boletos suspeitos?">Perguntar sobre boletos</button>
+  `;
 }
 
 function openModal(title, body, footer = "") {
@@ -848,6 +976,34 @@ function aiAnswer(question) {
   return "Revise a origem do registro, confira valores, NSU, autorização e lote bancário. Se a diferença persistir, abra um chamado técnico.";
 }
 
+function revealDashboardDivergences() {
+  state.filtersVisible = true;
+  localStorage.setItem("oxnexus.filtersVisible", "true");
+  if (state.screen !== "dashboard") {
+    showApp("dashboard");
+  } else {
+    renderScreen("dashboard");
+  }
+  setTimeout(() => {
+    document.querySelector(".divergences-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 0);
+  showToast("Divergências exibidas com filtros ativos.");
+}
+
+function refreshDashboardData() {
+  const refreshButtons = document.querySelectorAll('[data-action="refresh-data"]');
+  refreshButtons.forEach((button) => {
+    button.disabled = true;
+    button.dataset.originalText = button.textContent;
+    button.textContent = "Atualizando...";
+  });
+  showToast("Atualizando dados demonstrativos...");
+  setTimeout(() => {
+    if (state.screen === "dashboard") renderScreen("dashboard");
+    showToast("Dados atualizados.");
+  }, 650);
+}
+
 function routeFromHash() {
   const hash = window.location.hash.replace("#", "");
   if (hash === "login") return showLogin();
@@ -861,6 +1017,12 @@ function routeFromHash() {
 }
 
 document.addEventListener("click", (event) => {
+  const aiDrawerQuestion = event.target.closest("[data-ai-drawer-question]");
+  if (aiDrawerQuestion) {
+    answerAiDrawer(aiDrawerQuestion.dataset.aiDrawerQuestion);
+    return;
+  }
+
   const questionButton = event.target.closest("[data-question]");
   if (questionButton) {
     askAi(questionButton.dataset.question);
@@ -905,8 +1067,22 @@ document.addEventListener("click", (event) => {
     renderScreen(state.screen);
     showToast(state.filtersVisible ? "Filtros exibidos." : "Filtros ocultos para ampliar a área útil.");
   }
+  if (action === "toggle-advanced-summary") {
+    state.advancedSummaryVisible = !state.advancedSummaryVisible;
+    localStorage.setItem("oxnexus.advancedSummaryVisible", String(state.advancedSummaryVisible));
+    renderScreen(state.screen);
+  }
   if (action === "technical") showApp("technical");
-  if (action === "ask-ai") showApp("ai");
+  if (action === "ask-ai") openAiDrawer();
+  if (action === "ask-ai-screen") {
+    drawer.classList.add("hidden");
+    showApp("ai");
+  }
+  if (action === "show-divergences") revealDashboardDivergences();
+  if (action === "show-suspect-boletos") {
+    showApp("boletos");
+    showToast("Boletos suspeitos carregados para revisão.");
+  }
   if (action === "contact") showToast("Solicitação registrada. Um especialista entraria em contato nesta etapa.");
   if (action === "import-file") openUploadModal();
   if (action === "validate-layout") openModal("Validar layout", "<p>Layout validado com alertas. Não conseguimos interpretar algumas colunas; revise o mapeamento antes de processar.</p>");
@@ -945,16 +1121,16 @@ document.addEventListener("click", (event) => {
   }
   if (action === "auto-reconcile") showToast("Conciliação automática simulada com tolerância de R$ 0,10.");
   if (action === "approve-adjustment") showToast("Ajuste aprovado no protótipo.");
-  if (action === "export-report") showToast("Relatório simulado gerado para demonstração.");
+  if (action === "export-report") showToast(`${label} gerado no protótipo.`);
   if (action === "create-rule") openModal("Criar regra", "<p>Regra criada para aproximar NSU, autorização, valor e data. O próximo reprocessamento usará esse critério.</p>");
   if (action === "attach-file") showToast("Comprovante anexado visualmente ao chamado.");
   if (action === "save-settings") showToast("Configurações salvas no protótipo.");
   if (action === "connect-source") openModal("Conectar fonte", "<p>Integrações reais não fazem parte desta versão. A fonte fica simulada com dados mockados.</p>");
   if (action === "apply-filters") showToast("Filtros aplicados aos dados fictícios.");
   if (action === "clear-filters") showToast("Filtros limpos.");
-  if (action === "refresh-data") showToast("Dados atualizados visualmente com a base demonstrativa.");
+  if (action === "refresh-data") refreshDashboardData();
   if (action === "expand-table") {
-    const tableCard = target.closest(".table-card");
+    const tableCard = target.closest(".table-card, .reference-panel");
     tableCard?.classList.toggle("expanded-table");
     target.textContent = tableCard?.classList.contains("expanded-table") ? "Reduzir tabela" : "Expandir tabela";
   }
