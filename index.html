@@ -333,8 +333,12 @@
       <div id="appShell" class="app-shell hidden">
         <aside class="sidebar">
           <button class="mobile-close" type="button" data-action="toggle-menu" aria-label="Fechar menu">×</button>
-          <div class="sidebar-brand">
-            <img src="assets/oxnexus-logo-dark.png" alt="OxNexus" />
+          <div class="sidebar-head">
+            <div class="sidebar-brand" aria-label="OxNexus">
+              <span class="brand-symbol" aria-hidden="true">Ox</span>
+              <span class="brand-word">OxNexus</span>
+            </div>
+            <button class="sidebar-collapse" type="button" data-action="toggle-sidebar-collapse" aria-label="Recolher menu" title="Recolher menu">☰</button>
           </div>
           <nav id="sideMenu" class="side-menu" aria-label="Menu da plataforma"></nav>
           <button class="side-logout" type="button" data-action="logout">Sair do protótipo</button>
@@ -347,6 +351,7 @@
               <h1 id="screenTitle">Dashboard</h1>
             </div>
             <div class="topbar-actions">
+              <button class="secondary-button compact-button" type="button" data-action="toggle-focus">Modo foco</button>
               <button class="secondary-button compact-button" type="button" data-action="technical">Perfil técnico</button>
               <button class="primary-button compact-button" type="button" data-action="ask-ai">Perguntar à IA</button>
             </div>
@@ -385,6 +390,6 @@
       </div>
     </div>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

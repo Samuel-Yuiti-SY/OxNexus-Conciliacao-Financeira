@@ -19,6 +19,10 @@ const state = {
   screen: "dashboard",
   toastTimer: null,
   fraudConfirmed: false,
+  sidebarCollapsed: localStorage.getItem("oxnexus.sidebarCollapsed") === "true",
+  focusMode: false,
+  filtersVisible: localStorage.getItem("oxnexus.filtersVisible") !== "false",
+  filtersBeforeFocus: true,
   imports: [
     ["vendas_pdv_01062026.csv", "Vendas ERP/PDV", "PDV", "01/06/2026", "420", "418", "2", "Processado", "Lucas Henrique"],
     ["cielo_recebiveis_junho.csv", "Agenda de recebíveis", "Cielo", "01/06/2026", "385", "380", "5", "Com divergências", "Samuel Yuiti"],
@@ -238,18 +242,32 @@ function showApp(screen = "dashboard") {
   setHash(screen);
   renderMenu();
   renderScreen(screen);
+  applyAppLayout();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderMenu() {
   sideMenu.innerHTML = screens
     .map((item) => `
-      <button type="button" class="${item.id === state.screen ? "active" : ""}" data-action="nav-screen" data-screen="${item.id}">
+      <button type="button" class="${item.id === state.screen ? "active" : ""}" data-action="nav-screen" data-screen="${item.id}" title="${item.label}">
         <span class="menu-icon">${item.icon}</span>
-        <span>${item.label}</span>
+        <span class="menu-text">${item.label}</span>
       </button>
     `)
     .join("");
+}
+
+function applyAppLayout() {
+  appShell.classList.toggle("sidebar-collapsed", state.sidebarCollapsed && !state.focusMode);
+  appShell.classList.toggle("focus-mode", state.focusMode);
+  document.querySelectorAll('[data-action="toggle-focus"]').forEach((button) => {
+    button.textContent = state.focusMode ? "Sair do modo foco" : "Modo foco";
+  });
+  document.querySelectorAll('[data-action="toggle-sidebar-collapse"]').forEach((button) => {
+    const label = state.sidebarCollapsed ? "Expandir menu" : "Recolher menu";
+    button.title = label;
+    button.setAttribute("aria-label", label);
+  });
 }
 
 function renderScreen(screen) {
@@ -281,10 +299,13 @@ function renderScreen(screen) {
 }
 
 function screenIntro(title, text, action = "") {
+  const backAction = state.screen !== "dashboard"
+    ? `<button class="secondary-button compact-button" type="button" data-action="nav-screen" data-screen="dashboard">Voltar ao dashboard</button>`
+    : "";
   return `
     <div class="screen-intro">
       <p><strong>${title}.</strong> ${text}</p>
-      ${action ? `<div class="toolbar">${action}</div>` : ""}
+      ${(action || backAction) ? `<div class="toolbar">${action}${backAction}</div>` : ""}
     </div>
   `;
 }
@@ -301,12 +322,27 @@ function renderCompanyStrip() {
 }
 
 function renderFilters(filters = commonFilters) {
+  if (state.focusMode) return "";
+  if (!state.filtersVisible) {
+    return `
+      <div class="filters-summary">
+        <span>Filtros ativos: período, empresa, status</span>
+        <button class="secondary-button compact-button" type="button" data-action="toggle-filters">Mostrar filtros</button>
+      </div>
+    `;
+  }
   return `
-    <div class="filter-bar dense">
-      ${filters.map((filter) => `<label>${filter}<input type="text" value="${defaultFilterValue(filter)}" /></label>`).join("")}
-      <button class="primary-button compact-button" type="button" data-action="apply-filters">Aplicar filtros</button>
-      <button class="secondary-button compact-button" type="button" data-action="clear-filters">Limpar</button>
-      <button class="secondary-button compact-button" type="button" data-action="export-report">Exportar relatório</button>
+    <div class="filters-shell">
+      <div class="filters-heading">
+        <span>Filtros ativos: período, empresa, status</span>
+        <button class="secondary-button compact-button" type="button" data-action="toggle-filters">Ocultar filtros</button>
+      </div>
+      <div class="filter-bar dense">
+        ${filters.map((filter) => `<label>${filter}<input type="text" value="${defaultFilterValue(filter)}" /></label>`).join("")}
+        <button class="primary-button compact-button" type="button" data-action="apply-filters">Aplicar filtros</button>
+        <button class="secondary-button compact-button" type="button" data-action="clear-filters">Limpar</button>
+        <button class="secondary-button compact-button" type="button" data-action="export-report">Exportar relatório</button>
+      </div>
     </div>
   `;
 }
@@ -337,6 +373,10 @@ function actionFor(label) {
   if (value.includes("abrir chamado") || value.includes("solicitar analise") || value.includes("validacao tecnica")) return "open-ticket";
   if (value.includes("ver detalhes") || value.includes("ver regra")) return "open-drawer";
   if (value.includes("perguntar")) return "ask-ai";
+  if (value.includes("modo foco") || value.includes("sair do modo foco")) return "toggle-focus";
+  if (value.includes("ocultar filtros") || value.includes("mostrar filtros")) return "toggle-filters";
+  if (value.includes("recolher menu") || value.includes("expandir menu")) return "toggle-sidebar-collapse";
+  if (value.includes("atualizar dados")) return "refresh-data";
   if (value.includes("confirmar fraude")) return "confirm-fraud";
   if (value.includes("descartar")) return "discard-suspicion";
   if (value.includes("ignorar")) return "ignore-justification";
@@ -360,6 +400,43 @@ function renderActions(actions = []) {
         return `<button class="${primary ? "primary-button" : "secondary-button"} compact-button" type="button" data-action="${actionFor(label)}" data-label="${label}">${label}</button>`;
       }).join("")}
     </div>
+  `;
+}
+
+function kpiTone(label) {
+  const value = normalize(label);
+  if (value.includes("conciliadas") || value.includes("liquido")) return "ok";
+  if (value.includes("diverg") || value.includes("diferenca") || value.includes("taxas")) return "warn";
+  if (value.includes("fraudes") || value.includes("suspeitos") || value.includes("nao encontradas")) return "danger";
+  if (value.includes("recebido") || value.includes("confirmado")) return "info";
+  return "neutral";
+}
+
+function kpiIcon(label) {
+  const value = normalize(label);
+  if (value.includes("vendido")) return "ERP";
+  if (value.includes("operadoras")) return "OP";
+  if (value.includes("liquido")) return "R$";
+  if (value.includes("banco")) return "BC";
+  if (value.includes("diferenca")) return "Δ";
+  if (value.includes("conciliadas")) return "OK";
+  if (value.includes("divergentes")) return "!";
+  if (value.includes("nao encontradas")) return "?";
+  if (value.includes("boletos")) return "BL";
+  if (value.includes("fraudes")) return "AF";
+  if (value.includes("taxas")) return "%";
+  return "ON";
+}
+
+function renderTablePanel(title, headers, rows) {
+  return `
+    <article class="table-card">
+      <div class="table-heading">
+        <h3>${title}</h3>
+        <button class="secondary-button compact-button" type="button" data-action="expand-table">Expandir tabela</button>
+      </div>
+      ${renderTable(headers, rows)}
+    </article>
   `;
 }
 
@@ -394,12 +471,15 @@ function renderTable(headers, rows) {
 function renderDashboard() {
   return `
     ${renderCompanyStrip()}
-    ${screenIntro("Clareza operacional", "Empresas vendem todos os dias, mas precisam confiar que venderam, cobraram, tributaram, receberam e conciliaram tudo corretamente.", renderActions(["Nova importação", "Ver divergências", "Ver boletos suspeitos", "Gerar relatório", "Perguntar à IA"]))}
+    ${screenIntro("Clareza operacional", "Empresas vendem todos os dias, mas precisam confiar que venderam, cobraram, tributaram, receberam e conciliaram tudo corretamente.", renderActions(["Nova importação", "Ver divergências", "Ver boletos suspeitos", "Gerar relatório", "Perguntar à IA", "Exportar PDF", "Exportar Excel", "Atualizar dados", state.focusMode ? "Sair do modo foco" : "Modo foco", state.filtersVisible ? "Ocultar filtros" : "Mostrar filtros", state.sidebarCollapsed ? "Expandir menu" : "Recolher menu"]))}
     ${renderFilters(commonFilters)}
     <div class="kpi-grid">
       ${dashboardKpis.map(([label, value, note]) => `
-        <article class="stat-card">
-          <span>${label}</span>
+        <article class="stat-card ${kpiTone(label)}">
+          <div class="stat-head">
+            <span>${label}</span>
+            <i>${kpiIcon(label)}</i>
+          </div>
           <strong>${value}</strong>
           <small>${note}</small>
         </article>
@@ -496,10 +576,7 @@ function renderDataScreen(id) {
     ${screenIntro(table.description, "Identificamos o que está certo, o que está divergente e o que precisa de atenção. Menos conferência manual, mais confiança nos dados.")}
     ${renderFilters(table.filters)}
     ${renderActions(table.actions)}
-    <article class="table-card">
-      <h3>${screens.find((item) => item.id === id)?.title || "Dados"}</h3>
-      ${renderTable(table.headers, table.rows)}
-    </article>
+    ${renderTablePanel(screens.find((item) => item.id === id)?.title || "Dados", table.headers, table.rows)}
   `;
 }
 
@@ -516,10 +593,7 @@ function renderBoletos() {
       <article class="mini-card"><span>Possíveis fraudes</span><strong>2</strong></article>
       <article class="mini-card"><span>Em análise</span><strong>4</strong></article>
     </div>
-    <article class="table-card">
-      <h3>Boletos</h3>
-      ${renderTable(table.headers, table.rows)}
-    </article>
+    ${renderTablePanel("Boletos", table.headers, table.rows)}
   `;
 }
 
@@ -529,10 +603,7 @@ function renderReconciliations() {
     ${screenIntro(table.description, "A tela central cruza origem, valor esperado, valor encontrado, diferença, confiança e ação recomendada.")}
     ${renderFilters(table.filters)}
     ${renderActions(table.actions)}
-    <article class="table-card">
-      <h3>Conciliações</h3>
-      ${renderTable(table.headers, table.rows)}
-    </article>
+    ${renderTablePanel("Conciliações", table.headers, table.rows)}
     <article class="table-card" style="margin-top:14px">
       <h3>Regras de negócio simuladas</h3>
       <ul class="business-rules">
@@ -562,10 +633,7 @@ function renderAntifraud() {
       <article class="mini-card"><span>Divergências de valor</span><strong>3</strong></article>
       <article class="mini-card"><span>Duplicidades</span><strong>1</strong></article>
     </div>
-    <article class="table-card">
-      <h3>Lista de alertas</h3>
-      ${renderTable(["Alerta", "Tipo", "Boleto", "Regra acionada", "Nível de risco", "Valor", "Ação recomendada", "Status", "Ação"], alerts)}
-    </article>
+    ${renderTablePanel("Lista de alertas", ["Alerta", "Tipo", "Boleto", "Regra acionada", "Nível de risco", "Valor", "Ação recomendada", "Status", "Ação"], alerts)}
   `;
 }
 
@@ -579,9 +647,7 @@ function renderReports() {
       <article class="mini-card"><span>Valor divergente</span><strong>R$ 8.430,30</strong></article>
       <article class="mini-card"><span>Relatórios gerados</span><strong>18</strong></article>
     </div>
-    <article class="table-card">
-      <h3>Modelos disponíveis</h3>
-      ${renderTable(["Relatório", "Foco", "Periodicidade", "Status", "Ação"], [
+    ${renderTablePanel("Modelos disponíveis", ["Relatório", "Foco", "Periodicidade", "Status", "Ação"], [
         ["Resumo de conciliação", "Executivo", "Mensal", "Finalizado"],
         ["Divergências por operadora", "Operadoras", "Semanal", "Em análise"],
         ["Taxas cobradas a maior", "Taxas", "Mensal", "Finalizado"],
@@ -589,7 +655,6 @@ function renderReports() {
         ["Depósitos não identificados", "Banco", "Semanal", "Pendente"],
         ["Economia estimada", "Valor entregue", "Mensal", "Finalizado"],
       ])}
-    </article>
   `;
 }
 
@@ -817,6 +882,29 @@ document.addEventListener("click", (event) => {
   if (action === "logout") showLogin();
   if (action === "nav-screen") showApp(target.dataset.screen);
   if (action === "toggle-menu") document.querySelector(".sidebar").classList.toggle("open");
+  if (action === "toggle-sidebar-collapse") {
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    localStorage.setItem("oxnexus.sidebarCollapsed", String(state.sidebarCollapsed));
+    applyAppLayout();
+    if (state.screen === "dashboard") renderScreen("dashboard");
+  }
+  if (action === "toggle-focus") {
+    state.focusMode = !state.focusMode;
+    if (state.focusMode) {
+      state.filtersBeforeFocus = state.filtersVisible;
+      state.filtersVisible = false;
+    } else {
+      state.filtersVisible = state.filtersBeforeFocus;
+    }
+    applyAppLayout();
+    renderScreen(state.screen);
+  }
+  if (action === "toggle-filters") {
+    state.filtersVisible = !state.filtersVisible;
+    localStorage.setItem("oxnexus.filtersVisible", String(state.filtersVisible));
+    renderScreen(state.screen);
+    showToast(state.filtersVisible ? "Filtros exibidos." : "Filtros ocultos para ampliar a área útil.");
+  }
   if (action === "technical") showApp("technical");
   if (action === "ask-ai") showApp("ai");
   if (action === "contact") showToast("Solicitação registrada. Um especialista entraria em contato nesta etapa.");
@@ -864,6 +952,12 @@ document.addEventListener("click", (event) => {
   if (action === "connect-source") openModal("Conectar fonte", "<p>Integrações reais não fazem parte desta versão. A fonte fica simulada com dados mockados.</p>");
   if (action === "apply-filters") showToast("Filtros aplicados aos dados fictícios.");
   if (action === "clear-filters") showToast("Filtros limpos.");
+  if (action === "refresh-data") showToast("Dados atualizados visualmente com a base demonstrativa.");
+  if (action === "expand-table") {
+    const tableCard = target.closest(".table-card");
+    tableCard?.classList.toggle("expanded-table");
+    target.textContent = tableCard?.classList.contains("expanded-table") ? "Reduzir tabela" : "Expandir tabela";
+  }
   if (action === "send-ai") {
     const input = document.querySelector("#aiInput");
     askAi(input ? input.value : "");

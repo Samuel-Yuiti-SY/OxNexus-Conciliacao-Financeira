@@ -1,0 +1,15 @@
+{
+  "name": "oxnexus-conciliacao-financeira",
+  "version": "1.0.0",
+  "description": "Landing page e protótipo interativo da OxNexus, uma plataforma SaaS de conciliação financeira inteligente.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
