@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://oxnexus-conciliacao-financeira.vercel.app/sitemap.xml
