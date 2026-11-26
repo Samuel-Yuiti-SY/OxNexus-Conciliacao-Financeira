@@ -252,7 +252,12 @@ function showLanding(hash = "inicio") {
   prototype.classList.add("hidden");
   hideOverlays();
   setHash(hash);
-  setTimeout(() => document.querySelector(`#${hash}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  if (hash !== "inicio") {
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+    document.querySelector(`#${hash}`)?.scrollIntoView({ behavior, block: "start" });
+  } else if (window.scrollY > 0) {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
 }
 
 function showLogin() {

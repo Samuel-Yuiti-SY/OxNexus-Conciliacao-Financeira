@@ -10,39 +10,63 @@
     />
     <link rel="preload" href="./assets/oxnexus-logo.png" as="image" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="design-system.css" />
   </head>
   <body>
+    <a class="skip-link" href="#inicio">Ir para o conteúdo</a>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <main id="landing" class="landing-shell">
       <header class="site-header" aria-label="Navegação principal">
         <a class="brand-lockup" href="#inicio" aria-label="OxNexus início">
-          <img src="./assets/oxnexus-logo.png" alt="OxNexus" class="brand-logo" />
+          <img
+            src="./assets/oxnexus-logo.png"
+            alt="OxNexus"
+            class="brand-logo"
+          />
         </a>
         <nav class="site-nav">
           <a href="#solucao">Solução</a>
           <a href="#modulos">Módulos</a>
           <a href="#planos">Planos</a>
-          <button class="nav-button" type="button" data-action="open-login">Protótipo</button>
+          <button class="nav-button" type="button" data-action="open-login">
+            Protótipo
+          </button>
         </nav>
       </header>
 
       <section id="inicio" class="hero-section landing-hero">
         <div class="hero-content landing-hero-content">
-          <p class="eyebrow">Do caos financeiro à clareza operacional.</p>
-          <h1>Conciliação financeira <span>inteligente</span></h1>
+          <p class="eyebrow">OXNEXUS · OPERAÇÕES FINANCEIRAS</p>
+          <h1>Da venda ao banco.<br /><span>Confira cada diferença.</span></h1>
           <p class="hero-copy">
-            A OxNexus ajuda empresas a validarem se aquilo que foi vendido, cobrado,
-            pago e recebido realmente está correto.
+            A OxNexus ajuda empresas a validarem se aquilo que foi vendido,
+            cobrado, pago e recebido realmente está correto.
           </p>
           <div class="hero-actions">
-            <button class="primary-button" type="button" data-action="open-demo">Acessar protótipo</button>
-            <button class="secondary-button" type="button" data-action="contact">Falar com especialista</button>
+            <button
+              class="primary-button"
+              type="button"
+              data-action="open-demo"
+            >
+              Acessar protótipo
+            </button>
+            <button
+              class="secondary-button"
+              type="button"
+              data-action="contact"
+            >
+              Falar com especialista
+            </button>
           </div>
           <p class="hero-note">
-            Dados financeiros só geram valor quando a empresa consegue confiar neles.
+            Protótipo demonstrativo com dados simulados. Integrações e operações
+            financeiras reais não estão disponíveis.
           </p>
-          <div class="hero-metrics hero-chips" aria-label="Indicadores de demonstração">
+          <div
+            class="hero-metrics hero-chips"
+            aria-label="Indicadores de demonstração"
+          >
             <span>Boletos suspeitos</span>
             <span>Taxas divergentes</span>
             <span>Pagamentos pendentes</span>
@@ -50,7 +74,13 @@
           </div>
         </div>
 
-        <div class="landing-dashboard-preview" aria-label="Preview visual do dashboard OxNexus">
+        <div
+          class="landing-dashboard-preview"
+          aria-label="Preview visual do dashboard OxNexus"
+        >
+          <p class="preview-label">
+            VISÃO DA OPERAÇÃO <span>DADOS SIMULADOS</span>
+          </p>
           <div class="preview-top-cards">
             <div class="preview-card">
               <span>Vendas</span>
@@ -108,64 +138,124 @@
       <section class="content-band pain-band">
         <div class="section-heading">
           <p class="eyebrow">Dor real da operação</p>
-          <h2>Empresas vendem todos os dias. Mas muitas não sabem se receberam corretamente.</h2>
+          <h2>
+            Empresas vendem todos os dias. Mas muitas não sabem se receberam
+            corretamente.
+          </h2>
           <p>
-            No dia a dia, as informações financeiras ficam espalhadas entre banco, ERP,
-            operadora, boleto, NFC-e, e-commerce e planilhas. Quando algo não bate,
-            alguém precisa parar tudo para conferir manualmente.
+            No dia a dia, as informações financeiras ficam espalhadas entre
+            banco, ERP, operadora, boleto, NFC-e, e-commerce e planilhas. Quando
+            algo não bate, alguém precisa parar tudo para conferir manualmente.
           </p>
         </div>
         <div class="card-grid six">
-          <article class="info-card"><span class="card-icon">01</span><h3>Conferência manual</h3><p>Horas gastas em conferências repetitivas.</p></article>
-          <article class="info-card"><span class="card-icon">02</span><h3>Retrabalho financeiro</h3><p>O time volta aos mesmos arquivos para explicar diferenças.</p></article>
-          <article class="info-card"><span class="card-icon">03</span><h3>Taxas divergentes</h3><p>Cobranças pequenas que somam impacto relevante no mês.</p></article>
-          <article class="info-card"><span class="card-icon">04</span><h3>Boletos suspeitos</h3><p>Pagamentos que precisam de revisão antes de virarem prejuízo.</p></article>
-          <article class="info-card"><span class="card-icon">05</span><h3>Depósitos não identificados</h3><p>Valores entram no banco sem vínculo claro com a venda.</p></article>
-          <article class="info-card"><span class="card-icon">06</span><h3>Falta de confiança</h3><p>Relatórios existem, mas a decisão ainda fica insegura.</p></article>
+          <article class="info-card">
+            <span class="card-icon">01</span>
+            <h3>Conferência manual</h3>
+            <p>Horas gastas em conferências repetitivas.</p>
+          </article>
+          <article class="info-card">
+            <span class="card-icon">02</span>
+            <h3>Retrabalho financeiro</h3>
+            <p>O time volta aos mesmos arquivos para explicar diferenças.</p>
+          </article>
+          <article class="info-card">
+            <span class="card-icon">03</span>
+            <h3>Taxas divergentes</h3>
+            <p>Cobranças pequenas que somam impacto relevante no mês.</p>
+          </article>
+          <article class="info-card">
+            <span class="card-icon">04</span>
+            <h3>Boletos suspeitos</h3>
+            <p>Pagamentos que precisam de revisão antes de virarem prejuízo.</p>
+          </article>
+          <article class="info-card">
+            <span class="card-icon">05</span>
+            <h3>Depósitos não identificados</h3>
+            <p>Valores entram no banco sem vínculo claro com a venda.</p>
+          </article>
+          <article class="info-card">
+            <span class="card-icon">06</span>
+            <h3>Falta de confiança</h3>
+            <p>Relatórios existem, mas a decisão ainda fica insegura.</p>
+          </article>
         </div>
       </section>
 
       <section class="content-band split-band">
         <div class="section-heading compact">
-          <p class="eyebrow">Como uma conciliadora real funciona</p>
+          <p class="eyebrow">FLUXO DE CONCILIAÇÃO</p>
           <h2>Da venda ao depósito bancário.</h2>
           <p>
-            A OxNexus acompanha o caminho da transação desde a venda registrada no ERP
-            ou PDV até a confirmação do recebimento no banco.
+            A OxNexus acompanha o caminho da transação desde a venda registrada
+            no ERP ou PDV até a confirmação do recebimento no banco.
           </p>
         </div>
         <div class="flow-board" aria-label="Fluxo antes e depois da OxNexus">
           <div class="flow-line strong">
-            <span>ERP/PDV</span><b></b><span>Operadora/Gateway</span><b></b><span>Agenda de recebíveis</span><b></b><span>Banco</span><b></b><span>Conciliação</span><b></b><span>Ação recomendada</span>
+            <span>ERP/PDV</span><b></b><span>Operadora/Gateway</span><b></b
+            ><span>Agenda de recebíveis</span><b></b><span>Banco</span><b></b
+            ><span>Conciliação</span><b></b><span>Ação recomendada</span>
           </div>
         </div>
         <div class="process-steps">
-          <article><strong>1</strong><span>A venda é registrada.</span></article>
-          <article><strong>2</strong><span>A operadora confirma ou não a transação.</span></article>
-          <article><strong>3</strong><span>Taxas e parcelas são calculadas.</span></article>
-          <article><strong>4</strong><span>O valor líquido é previsto.</span></article>
-          <article><strong>5</strong><span>O banco confirma o depósito.</span></article>
-          <article><strong>6</strong><span>A OxNexus identifica se tudo bate.</span></article>
+          <article>
+            <strong>1</strong><span>A venda é registrada.</span>
+          </article>
+          <article>
+            <strong>2</strong
+            ><span>A operadora confirma ou não a transação.</span>
+          </article>
+          <article>
+            <strong>3</strong><span>Taxas e parcelas são calculadas.</span>
+          </article>
+          <article>
+            <strong>4</strong><span>O valor líquido é previsto.</span>
+          </article>
+          <article>
+            <strong>5</strong><span>O banco confirma o depósito.</span>
+          </article>
+          <article>
+            <strong>6</strong><span>A OxNexus identifica se tudo bate.</span>
+          </article>
         </div>
       </section>
 
       <section id="solucao" class="content-band solution-band">
         <div class="section-heading">
           <p class="eyebrow">Solução</p>
-          <h2>Você envia caos. Recebe estrutura.</h2>
+          <h2>Arquivos organizados. Diferenças identificadas.</h2>
           <p>
-            A OxNexus recebe informações financeiras, organiza os dados e cruza vendas,
-            pagamentos, boletos, taxas, NFC-e, e-commerce, bancos e operadoras em um
-            único fluxo inteligente.
+            A OxNexus recebe informações financeiras, organiza os dados e cruza
+            vendas, pagamentos, boletos, taxas, NFC-e, e-commerce, bancos e
+            operadoras em um único fluxo inteligente.
           </p>
         </div>
         <div class="card-grid six">
-          <article class="info-card"><h3>Importa arquivos</h3><p>Arquivos e fontes financeiras entram em um fluxo único.</p></article>
-          <article class="info-card"><h3>Valida dados</h3><p>Dados dispersos ganham padrão, consistência e contexto.</p></article>
-          <article class="info-card"><h3>Cruza informações</h3><p>Vendido, cobrado, pago, tributado e recebido são comparados.</p></article>
-          <article class="info-card"><h3>Identifica divergências</h3><p>Diferenças aparecem com valor, origem e prioridade.</p></article>
-          <article class="info-card"><h3>Detecta boletos suspeitos</h3><p>Boletos e registros suspeitos recebem classificação clara.</p></article>
-          <article class="info-card"><h3>Gera relatórios</h3><p>O financeiro enxerga o que está certo e o que precisa agir.</p></article>
+          <article class="info-card">
+            <h3>Importa arquivos</h3>
+            <p>Arquivos e fontes financeiras entram em um fluxo único.</p>
+          </article>
+          <article class="info-card">
+            <h3>Valida dados</h3>
+            <p>Dados dispersos ganham padrão, consistência e contexto.</p>
+          </article>
+          <article class="info-card">
+            <h3>Cruza informações</h3>
+            <p>Vendido, cobrado, pago, tributado e recebido são comparados.</p>
+          </article>
+          <article class="info-card">
+            <h3>Identifica divergências</h3>
+            <p>Diferenças aparecem com valor, origem e prioridade.</p>
+          </article>
+          <article class="info-card">
+            <h3>Detecta boletos suspeitos</h3>
+            <p>Boletos e registros suspeitos recebem classificação clara.</p>
+          </article>
+          <article class="info-card">
+            <h3>Gera relatórios</h3>
+            <p>O financeiro enxerga o que está certo e o que precisa agir.</p>
+          </article>
         </div>
       </section>
 
@@ -175,14 +265,47 @@
           <h2>Conciliação completa em um só lugar</h2>
         </div>
         <div class="module-grid">
-          <article><h3>Vendas</h3><p>Compara vendas do ERP/PDV com registros da operadora.</p></article>
-          <article><h3>Pagamentos</h3><p>Valida valores previstos, valores líquidos e depósitos bancários.</p></article>
-          <article><h3>Taxas</h3><p>Compara taxa contratada com taxa realmente cobrada.</p></article>
-          <article><h3>Boletos</h3><p>Identifica boletos pagos, vencidos, divergentes, suspeitos ou possíveis fraudes.</p></article>
-          <article><h3>NFC-e</h3><p>Cruza documento fiscal com venda e pagamento.</p></article>
-          <article><h3>E-commerce</h3><p>Valide pedidos, gateways, cancelamentos, reembolsos e chargebacks.</p></article>
-          <article><h3>Bancos</h3><p>Confere depósitos, extratos, CNAB e OFX.</p></article>
-          <article><h3>Operadoras</h3><p>Compara NSU, autorização, bandeira, taxa, parcela e liquidação.</p></article>
+          <article>
+            <h3>Vendas</h3>
+            <p>Compara vendas do ERP/PDV com registros da operadora.</p>
+          </article>
+          <article>
+            <h3>Pagamentos</h3>
+            <p>
+              Valida valores previstos, valores líquidos e depósitos bancários.
+            </p>
+          </article>
+          <article>
+            <h3>Taxas</h3>
+            <p>Compara taxa contratada com taxa realmente cobrada.</p>
+          </article>
+          <article>
+            <h3>Boletos</h3>
+            <p>
+              Identifica boletos pagos, vencidos, divergentes, suspeitos ou
+              possíveis fraudes.
+            </p>
+          </article>
+          <article>
+            <h3>NFC-e</h3>
+            <p>Cruza documento fiscal com venda e pagamento.</p>
+          </article>
+          <article>
+            <h3>E-commerce</h3>
+            <p>
+              Valide pedidos, gateways, cancelamentos, reembolsos e chargebacks.
+            </p>
+          </article>
+          <article>
+            <h3>Bancos</h3>
+            <p>Confere depósitos, extratos, CNAB e OFX.</p>
+          </article>
+          <article>
+            <h3>Operadoras</h3>
+            <p>
+              Compara NSU, autorização, bandeira, taxa, parcela e liquidação.
+            </p>
+          </article>
         </div>
       </section>
 
@@ -191,9 +314,9 @@
           <p class="eyebrow">Antifraude</p>
           <h2>Mais do que conciliação. Segurança financeira.</h2>
           <p>
-            Na primeira versão, a OxNexus identifica boletos suspeitos por regras simples.
-            No futuro, a validação poderá ocorrer por APIs e integrações com bancos, ERPs
-            e sistemas autorizados pelo cliente.
+            Na primeira versão, a OxNexus identifica boletos suspeitos por
+            regras simples. No futuro, a validação poderá ocorrer por APIs e
+            integrações com bancos, ERPs e sistemas autorizados pelo cliente.
           </p>
         </div>
         <div class="risk-layout">
@@ -220,25 +343,37 @@
       <section class="content-band ai-band">
         <div class="section-heading compact">
           <p class="eyebrow">IA contextual</p>
-          <h2>Ajuda inteligente dentro de cada tela</h2>
+          <h2>Orientação contextual na demonstração</h2>
           <p>
-            Se o cliente estiver na tela de boletos, a IA responde sobre boletos. Se
-            estiver na tela de taxas, responde sobre taxas. Se estiver na conciliação,
-            explica a divergência encontrada.
+            Se o cliente estiver na tela de boletos, a IA responde sobre
+            boletos. Se estiver na tela de taxas, responde sobre taxas. Se
+            estiver na conciliação, explica a divergência encontrada.
           </p>
         </div>
-        <div class="ai-examples" aria-label="Exemplos de conversa com IA OxNexus">
+        <div
+          class="ai-examples"
+          aria-label="Exemplos de conversa com IA OxNexus"
+        >
           <div class="chat-preview">
             <div class="message user">Por que esse boleto está suspeito?</div>
-            <div class="message ai">Ele foi marcado como suspeito porque o beneficiário informado é diferente do beneficiário cadastrado para essa empresa.</div>
+            <div class="message ai">
+              Ele foi marcado como suspeito porque o beneficiário informado é
+              diferente do beneficiário cadastrado para essa empresa.
+            </div>
           </div>
           <div class="chat-preview">
             <div class="message user">Por que essa taxa está divergente?</div>
-            <div class="message ai">A taxa cobrada foi de 2,90%, mas a taxa cadastrada para essa bandeira é 2,50%.</div>
+            <div class="message ai">
+              A taxa cobrada foi de 2,90%, mas a taxa cadastrada para essa
+              bandeira é 2,50%.
+            </div>
           </div>
           <div class="chat-preview">
             <div class="message user">O que devo fazer agora?</div>
-            <div class="message ai">Revise os dados da venda, confira o NSU e valide se o pagamento foi depositado no lote correto.</div>
+            <div class="message ai">
+              Revise os dados da venda, confira o NSU e valide se o pagamento
+              foi depositado no lote correto.
+            </div>
           </div>
         </div>
       </section>
@@ -265,11 +400,45 @@
           <p class="eyebrow">Planos</p>
           <h2>Planos para cada fase da operação</h2>
         </div>
+        <p class="pricing-note">
+          Valores apresentados na proposta do projeto. Contratação,
+          disponibilidade e integrações dependem de validação comercial.
+        </p>
         <div class="pricing-grid">
-          <article class="price-card"><h3>Start</h3><strong>R$ 790/mês</strong><p>Implantação: R$ 3.500</p><span>Ideal para empresas em fase inicial de organização financeira.</span></article>
-          <article class="price-card featured"><h3>Business</h3><strong>R$ 1.800/mês</strong><p>Implantação: R$ 3.500</p><span>Ideal para maior volume de vendas, boletos e conciliações.</span></article>
-          <article class="price-card"><h3>Enterprise</h3><strong>R$ 2.990/mês</strong><p>Implantação: R$ 4.200</p><span>Ideal para redes, franquias e empresas com múltiplos CNPJs.</span></article>
-          <article class="price-card"><h3>Corporate / White Label</h3><strong>A partir de R$ 5.500/mês</strong><p>Implantação sob consulta</p><span>Ideal para contabilidades, BPOs financeiros e grandes operações.</span></article>
+          <article class="price-card">
+            <h3>Start</h3>
+            <strong>R$ 790/mês</strong>
+            <p>Implantação: R$ 3.500</p>
+            <span
+              >Ideal para empresas em fase inicial de organização
+              financeira.</span
+            >
+          </article>
+          <article class="price-card featured">
+            <h3>Business</h3>
+            <strong>R$ 1.800/mês</strong>
+            <p>Implantação: R$ 3.500</p>
+            <span
+              >Ideal para maior volume de vendas, boletos e conciliações.</span
+            >
+          </article>
+          <article class="price-card">
+            <h3>Enterprise</h3>
+            <strong>R$ 2.990/mês</strong>
+            <p>Implantação: R$ 4.200</p>
+            <span
+              >Ideal para redes, franquias e empresas com múltiplos CNPJs.</span
+            >
+          </article>
+          <article class="price-card">
+            <h3>Corporate / White Label</h3>
+            <strong>A partir de R$ 5.500/mês</strong>
+            <p>Implantação sob consulta</p>
+            <span
+              >Ideal para contabilidades, BPOs financeiros e grandes
+              operações.</span
+            >
+          </article>
         </div>
         <div class="addon-row">
           <span>CNAB: R$ 15 por conta bancária/mês</span>
@@ -282,27 +451,50 @@
       <section class="content-band value-band">
         <div class="section-heading compact">
           <p class="eyebrow">Prova de valor</p>
-          <h2>A OxNexus não promete valor. Ela prova o valor entregue.</h2>
+          <h2>Um ponto de partida para medir o resultado.</h2>
           <p>
-            Com o serviço opcional de analista financeiro parceiro, a empresa pode medir
-            quanto tempo gasta hoje com conciliação manual e, após 3 meses de uso,
-            visualizar horas economizadas, retrabalho reduzido e divergências identificadas.
+            Com o serviço opcional de analista financeiro parceiro, a empresa
+            pode medir quanto tempo gasta hoje com conciliação manual e, após 3
+            meses de uso, visualizar horas economizadas, retrabalho reduzido e
+            divergências identificadas.
           </p>
         </div>
         <div class="proof-metrics">
-          <span><strong>Antes</strong> Planilhas, conferência manual e dados espalhados.</span>
-          <span><strong>Depois</strong> Dados organizados, alertas e decisões mais seguras.</span>
-          <span><strong>Resultado</strong> Tempo economizado, retrabalho reduzido e confiança financeira.</span>
+          <span
+            ><strong>Antes</strong> Planilhas, conferência manual e dados
+            espalhados.</span
+          >
+          <span
+            ><strong>Depois</strong> Dados organizados, alertas e decisões mais
+            seguras.</span
+          >
+          <span
+            ><strong>Resultado</strong> Tempo economizado, retrabalho reduzido e
+            confiança financeira.</span
+          >
         </div>
       </section>
 
       <section class="final-cta">
         <h2>Toda empresa vende. Toda empresa precisa confiar no que recebe.</h2>
-        <p>A OxNexus transforma dados financeiros dispersos em clareza para decisão.</p>
+        <p>
+          A OxNexus transforma dados financeiros dispersos em clareza para
+          decisão.
+        </p>
         <div class="hero-actions">
-          <button class="primary-button" type="button" data-action="contact">Solicitar demonstração</button>
-          <button class="secondary-button" type="button" data-action="open-login">Acessar protótipo</button>
-          <button class="secondary-button" type="button" data-action="contact">Falar com especialista</button>
+          <button class="primary-button" type="button" data-action="contact">
+            Solicitar demonstração
+          </button>
+          <button
+            class="secondary-button"
+            type="button"
+            data-action="open-login"
+          >
+            Acessar protótipo
+          </button>
+          <button class="secondary-button" type="button" data-action="contact">
+            Falar com especialista
+          </button>
         </div>
       </section>
 
@@ -321,7 +513,11 @@
     <section id="prototype" class="prototype-shell hidden" aria-live="polite">
       <div id="loginView" class="login-view">
         <div class="login-visual">
-          <img src="./assets/oxnexus-logo.png" alt="OxNexus" class="brand-logo" />
+          <img
+            src="./assets/oxnexus-logo.png"
+            alt="OxNexus"
+            class="brand-logo"
+          />
           <h2>Acesse sua visão financeira consolidada.</h2>
           <p>Venda, boleto, banco e ERP finalmente falando a mesma língua.</p>
           <div class="login-kpis">
@@ -331,47 +527,131 @@
           </div>
         </div>
         <form class="login-card" id="loginForm">
-          <button class="ghost-link back-home" type="button" data-action="back-home">Voltar para a landing page</button>
+          <button
+            class="ghost-link back-home"
+            type="button"
+            data-action="back-home"
+          >
+            Voltar para a landing page
+          </button>
           <h1>Entrar na plataforma</h1>
           <label>
             E-mail
-            <input name="email" type="email" value="admin@oxnexus.com" autocomplete="username" />
+            <input
+              name="email"
+              type="email"
+              value="admin@oxnexus.com"
+              autocomplete="username"
+            />
           </label>
           <label>
             Senha
-            <input name="password" type="password" value="123456" autocomplete="current-password" />
+            <input
+              name="password"
+              type="password"
+              value="123456"
+              autocomplete="current-password"
+            />
           </label>
           <button class="primary-button full" type="submit">Entrar</button>
-          <button class="secondary-button full" type="button" data-action="open-demo">Acessar demonstração</button>
-          <button class="ghost-link" type="button" data-action="forgot">Esqueci minha senha</button>
-          <p class="form-note">Usuário de demonstração: admin@oxnexus.com | Senha: 123456</p>
+          <button
+            class="secondary-button full"
+            type="button"
+            data-action="open-demo"
+          >
+            Acessar demonstração
+          </button>
+          <button class="ghost-link" type="button" data-action="forgot">
+            Esqueci minha senha
+          </button>
+          <p class="form-note">
+            Usuário de demonstração: admin@oxnexus.com | Senha: 123456
+          </p>
         </form>
       </div>
 
+      <p class="prototype-notice">
+        <strong>Ambiente de demonstração.</strong> Dados e ações simulados;
+        nenhuma transação real é realizada.
+      </p>
       <div id="appShell" class="app-shell hidden">
         <aside class="sidebar">
-          <button class="mobile-close" type="button" data-action="toggle-menu" aria-label="Fechar menu">×</button>
+          <button
+            class="mobile-close"
+            type="button"
+            data-action="toggle-menu"
+            aria-label="Fechar menu"
+          >
+            ×
+          </button>
           <div class="sidebar-head">
             <div class="sidebar-brand" aria-label="OxNexus">
-              <img src="./assets/oxnexus-logo.png" alt="OxNexus" class="brand-logo brand-logo-full" />
-              <img src="./assets/oxnexus-logo.png" alt="OxNexus" class="brand-logo brand-logo-icon" />
+              <img
+                src="./assets/oxnexus-logo.png"
+                alt="OxNexus"
+                class="brand-logo brand-logo-full"
+              />
+              <img
+                src="./assets/oxnexus-logo.png"
+                alt="OxNexus"
+                class="brand-logo brand-logo-icon"
+              />
             </div>
-            <button class="sidebar-collapse" type="button" data-action="toggle-sidebar-collapse" aria-label="Recolher menu" title="Recolher menu">☰</button>
+            <button
+              class="sidebar-collapse"
+              type="button"
+              data-action="toggle-sidebar-collapse"
+              aria-label="Recolher menu"
+              title="Recolher menu"
+            >
+              ☰
+            </button>
           </div>
-          <nav id="sideMenu" class="side-menu" aria-label="Menu da plataforma"></nav>
-          <button class="side-logout" type="button" data-action="logout">Sair do protótipo</button>
+          <nav
+            id="sideMenu"
+            class="side-menu"
+            aria-label="Menu da plataforma"
+          ></nav>
+          <button class="side-logout" type="button" data-action="logout">
+            Sair do protótipo
+          </button>
         </aside>
         <div class="app-main">
           <header class="app-topbar">
-            <button class="menu-toggle" type="button" data-action="toggle-menu" aria-label="Abrir menu">☰</button>
+            <button
+              class="menu-toggle"
+              type="button"
+              data-action="toggle-menu"
+              aria-label="Abrir menu"
+            >
+              ☰
+            </button>
             <div>
               <p id="screenEyebrow">OxNexus</p>
               <h1 id="screenTitle">Dashboard</h1>
             </div>
             <div class="topbar-actions">
-              <button class="secondary-button compact-button" type="button" data-action="toggle-focus">Modo foco</button>
-              <button class="secondary-button compact-button" type="button" data-action="technical">Perfil técnico</button>
-              <button class="primary-button compact-button" type="button" data-action="ask-ai">Perguntar à IA</button>
+              <button
+                class="secondary-button compact-button"
+                type="button"
+                data-action="toggle-focus"
+              >
+                Modo foco
+              </button>
+              <button
+                class="secondary-button compact-button"
+                type="button"
+                data-action="technical"
+              >
+                Perfil técnico
+              </button>
+              <button
+                class="primary-button compact-button"
+                type="button"
+                data-action="ask-ai"
+              >
+                Perguntar à IA
+              </button>
             </div>
           </header>
           <section id="appContent" class="app-content"></section>
@@ -379,9 +659,22 @@
       </div>
     </section>
 
-    <div id="actionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div
+      id="actionModal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
       <div class="modal-panel">
-        <button class="drawer-close" type="button" data-action="close-modal" aria-label="Fechar modal">×</button>
+        <button
+          class="drawer-close"
+          type="button"
+          data-action="close-modal"
+          aria-label="Fechar modal"
+        >
+          ×
+        </button>
         <p class="eyebrow" id="modalEyebrow">Ação simulada</p>
         <h2 id="modalTitle">OxNexus</h2>
         <div id="modalBody" class="modal-body"></div>
@@ -389,14 +682,27 @@
       </div>
     </div>
 
-    <div id="detailDrawer" class="drawer hidden" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div
+      id="detailDrawer"
+      class="drawer hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="drawerTitle"
+    >
       <div class="drawer-panel">
-        <button class="drawer-close" type="button" data-action="close-drawer" aria-label="Fechar detalhes">×</button>
+        <button
+          class="drawer-close"
+          type="button"
+          data-action="close-drawer"
+          aria-label="Fechar detalhes"
+        >
+          ×
+        </button>
         <p class="eyebrow">Detalhe da conciliação</p>
         <h2 id="drawerTitle">Registro em análise</h2>
         <p id="drawerText">
-          Identificamos divergências que precisam de atenção. Revise os dados antes de
-          confirmar a conciliação.
+          Identificamos divergências que precisam de atenção. Revise os dados
+          antes de confirmar a conciliação.
         </p>
         <div class="drawer-list">
           <span>Valor esperado: R$ 4.920,00</span>
@@ -404,7 +710,13 @@
           <span>Diferença: R$ 45,20</span>
           <span>Ação recomendada: revisar taxa cobrada</span>
         </div>
-        <button class="primary-button full" type="button" data-action="confirm-review">Marcar como revisado</button>
+        <button
+          class="primary-button full"
+          type="button"
+          data-action="confirm-review"
+        >
+          Marcar como revisado
+        </button>
       </div>
     </div>
 
