@@ -398,3 +398,5 @@ Eu realmente recebi o que vendi?
 ```
 
 A resposta vem com clareza, segurança e confiança financeira.
+
+As regras de interface e acessibilidade estão no [guia de design](DESIGN.md).

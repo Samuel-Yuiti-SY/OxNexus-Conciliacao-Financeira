@@ -490,7 +490,7 @@ function renderTable(headers, rows) {
     <div class="data-table-wrap">
       <table class="data-table">
         <thead>
-          <tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr>
+          <tr>${headers.map((header) => `<th scope="col">${header}</th>`).join("")}</tr>
         </thead>
         <tbody>
           ${rows.map((row) => {
@@ -498,7 +498,8 @@ function renderTable(headers, rows) {
             const cells = row.map((cell, index) => {
               const header = headers[index] || "";
               const shouldPill = /status|classificação|classificacao|risco|prioridade|nível|nivel/i.test(header);
-              return `<td>${shouldPill ? pill(cell) : cell}</td>`;
+              const amountClass = /^\s*[−-]?\s*R\$/.test(cell) ? ' class="ledger-amount"' : "";
+              return `<td${amountClass}>${shouldPill ? pill(cell) : cell}</td>`;
             });
             if (needsAction && row.length < headers.length) cells.push(`<td>${detailButton()}</td>`);
             return `<tr>${cells.join("")}</tr>`;

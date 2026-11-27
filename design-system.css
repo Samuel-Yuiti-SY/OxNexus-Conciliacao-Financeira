@@ -668,3 +668,6 @@ html {
 .ledger-difference {
   color: #ffd39f;
 }
+
+.ledger-sample tfoot { border-top: 2px solid var(--brand-teal); font-weight: 700; }
+.data-table td.ledger-amount { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
